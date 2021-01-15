@@ -21,7 +21,6 @@ async function run(): Promise<void> {
             "imageSize",
             "excludeActivity",
             "excludeRepo"
-
         ]);
 
         await generateReadme(inputs);

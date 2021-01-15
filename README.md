@@ -1,4 +1,5 @@
-# github-update-readme
+# github-contentful-readme
+## This is a work in progress, and is not functional yet
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
