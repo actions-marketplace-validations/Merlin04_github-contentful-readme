@@ -2,12 +2,12 @@ name: 'github-contentful-readme'
 description: 'Update your profile readme from the Contentful headless CMS'
 inputs:
   contentfulAccessToken:
-    description: 'Contentful content access token',
-    required: true,
-    default: '',
+    description: 'Contentful content access token'
+    required: true
+    default: ''
   contentfulSpaceId:
-    description: 'Contentful space ID (not the name)',
-    required: true,
+    description: 'Contentful space ID (not the name)'
+    required: true
     default: ''
   headerKey:
     description: 'The name of the Key-Value pair in Contentful with the header text'

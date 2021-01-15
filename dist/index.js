@@ -34,7 +34,7 @@ function generateReadme(inputs) {
         if (GITHUB_REPOSITORY === undefined) {
             throw new Error("GITHUB_REPOSITORY is undefined");
         }
-        const repoCount = parseInt(inputs["repoCount"]);
+        //const repoCount = parseInt(inputs["repoCount"]);
         const username = GITHUB_REPOSITORY.split("/")[0];
         const repo = GITHUB_REPOSITORY.split("/")[1];
         const getReadme = yield octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
