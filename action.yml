@@ -42,8 +42,6 @@ inputs:
     required: false
     default: '[]'
 
-outputs: []
-
 branding:
   icon: activity
   color: green

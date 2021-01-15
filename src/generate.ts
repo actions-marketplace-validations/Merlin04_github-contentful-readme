@@ -18,7 +18,7 @@ export default async function generateReadme(inputs: KeyValueStore) {
         throw new Error("GITHUB_REPOSITORY is undefined");
     }
 
-    const repoCount = parseInt(inputs["repoCount"]);
+    //const repoCount = parseInt(inputs["repoCount"]);
 
     const username = GITHUB_REPOSITORY.split("/")[0]
     const repo = GITHUB_REPOSITORY.split("/")[1]
