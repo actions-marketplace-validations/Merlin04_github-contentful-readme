@@ -81,10 +81,12 @@ function generateReadme(inputs) {
             });
         }*/
         const data = `
-#${inputs["header"]}
-##${inputs["subhead"]}
+#${inputs["headerKey"]}
 
-${inputs["footer"]}
+##${inputs["subheaderKey"]}
+
+
+${inputs["footerKey"]}
     `;
         const results = yield octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
             owner: username,
@@ -148,8 +150,8 @@ function run() {
         try {
             const inputs = getInputs([
                 "headerKey",
-                "subhead",
-                "footer",
+                "subheaderKey",
+                "footerKey",
                 "path",
                 "ref",
                 "imageSize",

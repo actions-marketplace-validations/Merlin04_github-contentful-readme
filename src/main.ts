@@ -14,8 +14,8 @@ async function run(): Promise<void> {
     try {
         const inputs = getInputs([
             "headerKey",
-            "subhead",
-            "footer",
+            "subheaderKey",
+            "footerKey",
             "path",
             "ref",
             "imageSize",

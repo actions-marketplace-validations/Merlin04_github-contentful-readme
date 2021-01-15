@@ -69,10 +69,12 @@ export default async function generateReadme(inputs: KeyValueStore) {
     }*/
 
     const data = `
-#${inputs["header"]}
-##${inputs["subhead"]}
+#${inputs["headerKey"]}
 
-${inputs["footer"]}
+##${inputs["subheaderKey"]}
+
+
+${inputs["footerKey"]}
     `;
 
     const results = await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {

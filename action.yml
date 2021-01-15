@@ -13,11 +13,11 @@ inputs:
     description: 'The name of the Key-Value pair in Contentful with the header text'
     required: true
     default: ''
-  subhead:
+  subheaderKey:
     description: 'The name of the Key-Value pair in Contentful with the subheader text'
     required: false
     default: ''
-  footer:
+  footerKey:
     description: 'The name of the Key-Value pair in Contentful with the footer text'
     required: false
     default: ''
