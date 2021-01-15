@@ -1,16 +1,24 @@
-name: 'github-update-readme'
-description: 'Update your profile README.md to show your latest activity.'
+name: 'github-contentful-readme'
+description: 'Update your profile readme from the Contentful headless CMS'
 inputs:
-  header:
-    description: 'The header of your README.md. Markdown supported.'
+  contentfulAccessToken:
+    description: 'Contentful content access token',
+    required: true,
+    default: '',
+  contentfulSpaceId:
+    description: 'Contentful space ID (not the name)',
+    required: true,
+    default: ''
+  headerKey:
+    description: 'The name of the Key-Value pair in Contentful with the header text'
     required: true
     default: ''
   subhead:
-    description: 'The subheader of your README.md. Markdown supported.'
+    description: 'The name of the Key-Value pair in Contentful with the subheader text'
     required: false
     default: ''
   footer:
-    description: 'The footer of your README.md. Markdown supported.'
+    description: 'The name of the Key-Value pair in Contentful with the footer text'
     required: false
     default: ''
   path:
@@ -21,14 +29,6 @@ inputs:
     description: 'Override the default branch/tag ref.'
     required: false
     default: 'master'
-  repoCount:
-    description: 'Number of repositories to load.'
-    required: false
-    default: '6'
-  reposPerRow:
-    description: 'Number of repositories to load per row.'
-    required: false
-    default: '3'
   imageSize:
     description: 'Length (in pixels) of each side of the square image.'
     required: false
@@ -41,21 +41,6 @@ inputs:
     description: "Repositories to exclude from the recent activity table. Read more on this repository's README.md."
     required: false
     default: '[]'
-  customReadmeFile:
-    description: "Customise the README.md file format without forking this repository. Read more on this repository's README.md. Markdown supported."
-    required: false
-    default: |
-      ## ${header}
-      
-      ${subhead}
-
-      ---
-      
-      ${repoTable}
-      
-      ---
-      
-      ${footer}
 
 outputs:
   repositories:
@@ -67,4 +52,4 @@ branding:
 
 runs:
   using: 'node12'
-  main: 'index.js'
+  main: 'dist/main.js'
