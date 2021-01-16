@@ -35,7 +35,7 @@ export default async function generateReadme(inputs: KeyValueStore) {
     const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
     const apolloClient = getApollo(inputs["contentfulAccessToken"], inputs["contentfulSpaceId"]);
-    const keyValuePairs = arrayToObjectMap(["header", "subheader", "footer"], item => item, item => inputs[item + "Key"]);
+    const keyValuePairs = arrayToObjectMap(["header", "subheader", "footer", "url"], item => item, item => inputs[item + "Key"]);
     const queryResult = await apolloClient.query<ReadmeDataQuery>({ query: ReadmeData, variables: {
         keyValuePairs: Object.keys(keyValuePairs),
         setOfProjectsCollectionId: inputs["setOfProjectsCollectionId"]

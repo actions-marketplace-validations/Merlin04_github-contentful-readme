@@ -10,6 +10,7 @@ async function run(): Promise<void> {
             "headerKey",
             "subheaderKey",
             "footerKey",
+            "urlKey",
             "setOfProjectsCollectionId",
             "path",
             "ref",
