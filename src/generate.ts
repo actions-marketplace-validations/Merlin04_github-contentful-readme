@@ -1,5 +1,7 @@
+import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client/core';
 import { Octokit } from '@octokit/core';
-import { KeyValueStore } from "./main";
+import { ReadmeQuery, README_QUERY } from './queries';
+import { KeyValueStore, arrayToObjectMap } from './utils';
 
 const chunkArray = <T>(array: T[], size: number) => {
     let chunked = [];
@@ -11,8 +13,29 @@ const chunkArray = <T>(array: T[], size: number) => {
     return chunked;
 }
 
+const getApollo = (token: string, space: string) => new ApolloClient({
+    link: new HttpLink({
+        uri: "https://graphql.contentful.com/content/v1/spaces/" + space,
+        headers: {
+            authorization: "Bearer " + token
+        }
+    }),
+    cache: new InMemoryCache()
+});
+
 export default async function generateReadme(inputs: KeyValueStore) {
     const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+
+    const apolloClient = getApollo(inputs["contentfulAccessToken"], inputs["contentfulSpaceId"]);
+    const keyValuePairs = arrayToObjectMap(["header", "subheader", "footer"], item => item, item => inputs[item + "Key"]);
+    const queryResult = await apolloClient.query<ReadmeQuery>({ query: README_QUERY, variables: {
+        keyValuePairs: Object.values(keyValuePairs)
+    }});
+    const queryKeyValuePairs = arrayToObjectMap(queryResult.data.items, kvp => kvp.value, kvp => keyValuePairs[kvp.key]);
+    /*const queryKeyValuePairs = queryResult.data.items.map(item => ({
+        [item.key]: item.value
+    })).reduce((prev, cur) => ({...prev, ...cur}));*/
+
     const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY;
     if (GITHUB_REPOSITORY === undefined) {
         throw new Error("GITHUB_REPOSITORY is undefined");
@@ -68,13 +91,15 @@ export default async function generateReadme(inputs: KeyValueStore) {
         });
     }*/
 
+    const getValueForKey = (key: string) => queryResult.data.items.filter(item => item.key === key)[0].value;
+
     const data = `
-#${inputs["headerKey"]}
+# ${queryKeyValuePairs["header"]}
 
-##${inputs["subheaderKey"]}
+## ${queryKeyValuePairs["subheader"]}
 
 
-${inputs["footerKey"]}
+${queryKeyValuePairs["footer"]}
     `;
 
     const results = await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {

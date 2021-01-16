@@ -1,18 +1,10 @@
 import * as core from '@actions/core';
 import generateReadme from './generate';
-
-export type KeyValueStore = {
-    [key: string]: string
-};
-
-const getInputs: {(names: string[]): KeyValueStore} = (names: string[]) =>
-    names
-        .map(item => ({ [item]: core.getInput(item) }))
-        .reduce((prev, current) => ({...prev, ...current}));
+import { arrayToObjectMap } from './utils';
 
 async function run(): Promise<void> {
     try {
-        const inputs = getInputs([
+        const inputs = arrayToObjectMap([
             "headerKey",
             "subheaderKey",
             "footerKey",
@@ -21,7 +13,7 @@ async function run(): Promise<void> {
             "imageSize",
             "excludeActivity",
             "excludeRepo"
-        ]);
+        ], (item) => core.getInput(item));
 
         await generateReadme(inputs);
     }
