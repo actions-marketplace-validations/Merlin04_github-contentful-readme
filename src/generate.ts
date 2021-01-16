@@ -33,7 +33,7 @@ export default async function generateReadme(inputs: KeyValueStore) {
     const queryResult = await apolloClient.query<ReadmeQuery>({ query: README_QUERY, variables: {
         keyValuePairs: Object.values(keyValuePairs)
     }});
-    console.log(`Requesting key-value pairs: ${keyValuePairs}`);
+    console.log(`Requesting key-value pairs: ${JSON.stringify(keyValuePairs)}`);
     console.log(queryResult);
     const queryKeyValuePairs = arrayToObjectMap(queryResult.data.items, kvp => kvp.value, kvp => keyValuePairs[kvp.key]);
     /*const queryKeyValuePairs = queryResult.data.items.map(item => ({
