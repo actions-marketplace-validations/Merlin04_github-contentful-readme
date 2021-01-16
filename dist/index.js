@@ -53,8 +53,8 @@ function generateReadme(inputs) {
                 keyValuePairs: Object.keys(keyValuePairs)
             } });
         console.log(`Requesting key-value pairs: ${JSON.stringify(keyValuePairs)}`);
-        console.log(queryResult);
-        const queryKeyValuePairs = utils_1.arrayToObjectMap(queryResult.data.items, kvp => kvp.value, kvp => keyValuePairs[kvp.key]);
+        console.log(queryResult.data.keyValuePairCollection);
+        const queryKeyValuePairs = utils_1.arrayToObjectMap(queryResult.data.keyValuePairCollection.items, kvp => kvp.value, kvp => keyValuePairs[kvp.key]);
         /*const queryKeyValuePairs = queryResult.data.items.map(item => ({
             [item.key]: item.value
         })).reduce((prev, cur) => ({...prev, ...cur}));*/
@@ -108,7 +108,6 @@ function generateReadme(inputs) {
                 recentReposHaveImage.push(false);
             });
         }*/
-        const getValueForKey = (key) => queryResult.data.items.filter(item => item.key === key)[0].value;
         const data = `
 # ${queryKeyValuePairs["header"]}
 

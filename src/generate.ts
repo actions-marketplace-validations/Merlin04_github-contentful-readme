@@ -34,8 +34,8 @@ export default async function generateReadme(inputs: KeyValueStore) {
         keyValuePairs: Object.keys(keyValuePairs)
     }});
     console.log(`Requesting key-value pairs: ${JSON.stringify(keyValuePairs)}`);
-    console.log(queryResult);
-    const queryKeyValuePairs = arrayToObjectMap(queryResult.data.items, kvp => kvp.value, kvp => keyValuePairs[kvp.key]);
+    console.log(queryResult.data.keyValuePairCollection);
+    const queryKeyValuePairs = arrayToObjectMap(queryResult.data.keyValuePairCollection.items, kvp => kvp.value, kvp => keyValuePairs[kvp.key]);
     /*const queryKeyValuePairs = queryResult.data.items.map(item => ({
         [item.key]: item.value
     })).reduce((prev, cur) => ({...prev, ...cur}));*/
@@ -94,9 +94,7 @@ export default async function generateReadme(inputs: KeyValueStore) {
             recentReposHaveImage.push(false);
         });
     }*/
-
-    const getValueForKey = (key: string) => queryResult.data.items.filter(item => item.key === key)[0].value;
-
+    
     const data = `
 # ${queryKeyValuePairs["header"]}
 

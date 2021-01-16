@@ -13,8 +13,10 @@ query ReadmeData($keyValuePairs: [String]) {
 }`;
 
 export interface ReadmeQuery {
-    items: {
-        key: string,
-        value: string
-    }[]
+    keyValuePairCollection: {
+        items: {
+            key: string,
+            value: string
+        }[]
+    }
 }
