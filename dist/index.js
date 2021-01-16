@@ -50,18 +50,19 @@ function throwUndefinedError(name) {
     return [];
 }
 function generateReadme(inputs) {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
         const octokit = new core_2.Octokit({ auth: process.env.GITHUB_TOKEN });
         const apolloClient = getApollo(inputs["contentfulAccessToken"], inputs["contentfulSpaceId"]);
-        const keyValuePairs = utils_1.arrayToObjectMap(["header", "subheader", "footer", "setOfProjectsCollectionId"], item => item, item => inputs[item + "Key"]);
+        const keyValuePairs = utils_1.arrayToObjectMap(["header", "subheader", "footer"], item => item, item => inputs[item + "Key"]);
         const queryResult = yield apolloClient.query({ query: graphql_1.ReadmeData, variables: {
                 keyValuePairs: Object.keys(keyValuePairs),
                 setOfProjectsCollectionId: inputs["setOfProjectsCollectionId"]
             } });
         console.log(`Requesting key-value pairs: ${JSON.stringify(keyValuePairs)}`);
         console.log(queryResult.data.keyValuePairCollection);
-        const queryKeyValuePairs = utils_1.arrayToObjectMap((_b = (_a = queryResult.data.keyValuePairCollection) === null || _a === void 0 ? void 0 : _a.items) !== null && _b !== void 0 ? _b : throwUndefinedError("keyValuePairCollection"), kvp => kvp.value, kvp => keyValuePairs[kvp.key]);
+        console.log((_a = queryResult.data.setOfProjectsCollection) === null || _a === void 0 ? void 0 : _a.items);
+        const queryKeyValuePairs = utils_1.arrayToObjectMap((_c = (_b = queryResult.data.keyValuePairCollection) === null || _b === void 0 ? void 0 : _b.items) !== null && _c !== void 0 ? _c : throwUndefinedError("keyValuePairCollection"), kvp => kvp.value, kvp => keyValuePairs[kvp.key]);
         /*const queryKeyValuePairs = queryResult.data.items.map(item => ({
             [item.key]: item.value
         })).reduce((prev, cur) => ({...prev, ...cur}));*/
@@ -121,7 +122,7 @@ function generateReadme(inputs) {
 ### ${queryKeyValuePairs["subheader"]}
 ${queryKeyValuePairs["url"] !== undefined ? (`
 <table><tr><td><a href="${queryKeyValuePairs["url"]}"><img align="left" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/link-24px.svg">Go to website</a></td></tr></table>`) : ""}
-${inputs["setOfProjectsCollectionId"] !== undefined ? (_c = queryResult.data.setOfProjectsCollection) === null || _c === void 0 ? void 0 : _c.items[0].featuredProjectsCollection.items.map(project => {
+${inputs["setOfProjectsCollectionId"] !== undefined ? (_d = queryResult.data.setOfProjectsCollection) === null || _d === void 0 ? void 0 : _d.items[0].featuredProjectsCollection.items.map(project => {
             var _a, _b;
             return (`
 <table align="left"><tr><td width="400px">
@@ -129,7 +130,7 @@ ${inputs["setOfProjectsCollectionId"] !== undefined ? (_c = queryResult.data.set
    <p>${project.tagline}</p>
    ${project.mediaCollection !== undefined ? (`<img src="${(_b = (_a = project.mediaCollection) === null || _a === void 0 ? void 0 : _a.items[0]) === null || _b === void 0 ? void 0 : _b.url}">`) : ""}
 </td></tr></table>`);
-        }) : ""}
+        }).reduce((prev, cur) => prev + cur) : ""}
 
 ${queryKeyValuePairs["footer"]}
     `;
@@ -476,6 +477,7 @@ function run() {
                 "headerKey",
                 "subheaderKey",
                 "footerKey",
+                "setOfProjectsCollectionId",
                 "path",
                 "ref",
                 "imageSize",

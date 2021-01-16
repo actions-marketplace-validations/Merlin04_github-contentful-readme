@@ -35,13 +35,14 @@ export default async function generateReadme(inputs: KeyValueStore) {
     const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
     const apolloClient = getApollo(inputs["contentfulAccessToken"], inputs["contentfulSpaceId"]);
-    const keyValuePairs = arrayToObjectMap(["header", "subheader", "footer", "setOfProjectsCollectionId"], item => item, item => inputs[item + "Key"]);
+    const keyValuePairs = arrayToObjectMap(["header", "subheader", "footer"], item => item, item => inputs[item + "Key"]);
     const queryResult = await apolloClient.query<ReadmeDataQuery>({ query: ReadmeData, variables: {
         keyValuePairs: Object.keys(keyValuePairs),
         setOfProjectsCollectionId: inputs["setOfProjectsCollectionId"]
     }});
     console.log(`Requesting key-value pairs: ${JSON.stringify(keyValuePairs)}`);
     console.log(queryResult.data.keyValuePairCollection);
+    console.log(queryResult.data.setOfProjectsCollection?.items);
     const queryKeyValuePairs = arrayToObjectMap(queryResult.data.keyValuePairCollection?.items ?? throwUndefinedError("keyValuePairCollection"), kvp => kvp.value, kvp => keyValuePairs[kvp.key]);
     /*const queryKeyValuePairs = queryResult.data.items.map(item => ({
         [item.key]: item.value
@@ -123,7 +124,7 @@ ${inputs["setOfProjectsCollectionId"] !== undefined ? queryResult.data.setOfProj
        `<img src="${project.mediaCollection?.items[0]?.url}">`
    ) : ""}
 </td></tr></table>`
-)) : ""}
+)).reduce((prev, cur) => prev + cur) : ""}
 
 ${queryKeyValuePairs["footer"]}
     `;
