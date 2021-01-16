@@ -27,6 +27,7 @@ const getApollo = (token: string, space: string) => new ApolloClient({
 
 export default async function generateReadme(inputs: KeyValueStore) {
     const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+    console.log(inputs["contentfulAccessToken"] + " " + inputs["contentfulSpaceId"]);
 
     const apolloClient = getApollo(inputs["contentfulAccessToken"], inputs["contentfulSpaceId"]);
     const keyValuePairs = arrayToObjectMap(["header", "subheader", "footer"], item => item, item => inputs[item + "Key"]);
