@@ -1,5 +1,6 @@
 import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client/core';
 import { Octokit } from '@octokit/core';
+import fetch from 'cross-fetch';
 import { ReadmeQuery, README_QUERY } from './queries';
 import { KeyValueStore, arrayToObjectMap } from './utils';
 
@@ -18,7 +19,8 @@ const getApollo = (token: string, space: string) => new ApolloClient({
         uri: "https://graphql.contentful.com/content/v1/spaces/" + space,
         headers: {
             authorization: "Bearer " + token
-        }
+        },
+        fetch
     }),
     cache: new InMemoryCache()
 });

@@ -16,9 +16,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(9900);
 const core_2 = __nccwpck_require__(6762);
+const cross_fetch_1 = __importDefault(__nccwpck_require__(9805));
 const queries_1 = __nccwpck_require__(775);
 const utils_1 = __nccwpck_require__(918);
 const chunkArray = (array, size) => {
@@ -35,7 +39,8 @@ const getApollo = (token, space) => new core_1.ApolloClient({
         uri: "https://graphql.contentful.com/content/v1/spaces/" + space,
         headers: {
             authorization: "Bearer " + token
-        }
+        },
+        fetch: cross_fetch_1.default
     }),
     cache: new core_1.InMemoryCache()
 });
@@ -7854,6 +7859,33 @@ function removeHook (state, name, method) {
 
   state.registry[name].splice(index, 1)
 }
+
+
+/***/ }),
+
+/***/ 9805:
+/***/ ((module, exports, __nccwpck_require__) => {
+
+var nodeFetch = __nccwpck_require__(467)
+var realFetch = nodeFetch.default || nodeFetch
+
+var fetch = function (url, options) {
+  // Support schemaless URIs on the server for parity with the browser.
+  // Ex: //github.com/ -> https://github.com/
+  if (/^\/\//.test(url)) {
+    url = 'https:' + url
+  }
+  return realFetch.call(this, url, options)
+}
+
+module.exports = exports = fetch
+exports.fetch = fetch
+exports.Headers = nodeFetch.Headers
+exports.Request = nodeFetch.Request
+exports.Response = nodeFetch.Response
+
+// Needed for TypeScript consumers without esModuleInterop.
+exports.default = fetch
 
 
 /***/ }),
