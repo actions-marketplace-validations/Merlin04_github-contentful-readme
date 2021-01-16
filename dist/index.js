@@ -199,7 +199,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.README_QUERY = void 0;
 const core_1 = __nccwpck_require__(9900);
 exports.README_QUERY = core_1.gql `
-query ReadmeData($keyValuePairs: String[]) {
+query ReadmeData($keyValuePairs: [String]) {
     keyValuePairCollection(where: {
         key_in: $keyValuePairs
     }) {
