@@ -1,7 +1,7 @@
 import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client/core';
 import { Octokit } from '@octokit/core';
 import fetch from 'cross-fetch';
-import { ReadmeQuery, README_QUERY } from './queries';
+import { ReadmeData, ReadmeDataQuery } from './generated/graphql';
 import { KeyValueStore, arrayToObjectMap } from './utils';
 
 const chunkArray = <T>(array: T[], size: number) => {
@@ -25,17 +25,23 @@ const getApollo = (token: string, space: string) => new ApolloClient({
     cache: new InMemoryCache()
 });
 
+function throwUndefinedError(name: string) {
+    throw new Error(name + " is undefined");
+    // Unreachable code included to make TypeScript think this can return something
+    return [];
+}
+
 export default async function generateReadme(inputs: KeyValueStore) {
     const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
     const apolloClient = getApollo(inputs["contentfulAccessToken"], inputs["contentfulSpaceId"]);
     const keyValuePairs = arrayToObjectMap(["header", "subheader", "footer"], item => item, item => inputs[item + "Key"]);
-    const queryResult = await apolloClient.query<ReadmeQuery>({ query: README_QUERY, variables: {
+    const queryResult = await apolloClient.query<ReadmeDataQuery>({ query: ReadmeData, variables: {
         keyValuePairs: Object.keys(keyValuePairs)
     }});
     console.log(`Requesting key-value pairs: ${JSON.stringify(keyValuePairs)}`);
     console.log(queryResult.data.keyValuePairCollection);
-    const queryKeyValuePairs = arrayToObjectMap(queryResult.data.keyValuePairCollection.items, kvp => kvp.value, kvp => keyValuePairs[kvp.key]);
+    const queryKeyValuePairs = arrayToObjectMap(queryResult.data.keyValuePairCollection?.items ?? throwUndefinedError("keyValuePairCollection"), kvp => kvp.value, kvp => keyValuePairs[kvp.key]);
     /*const queryKeyValuePairs = queryResult.data.items.map(item => ({
         [item.key]: item.value
     })).reduce((prev, cur) => ({...prev, ...cur}));*/
@@ -94,11 +100,11 @@ export default async function generateReadme(inputs: KeyValueStore) {
             recentReposHaveImage.push(false);
         });
     }*/
-    
+
     const data = `
 # ${queryKeyValuePairs["header"]}
 
-## ${queryKeyValuePairs["subheader"]}
+### ${queryKeyValuePairs["subheader"]}
 
 
 ${queryKeyValuePairs["footer"]}

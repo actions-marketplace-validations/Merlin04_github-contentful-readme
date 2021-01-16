@@ -1,0 +1,10 @@
+query ReadmeData($keyValuePairs: [String]) {
+    keyValuePairCollection(where: {
+        key_in: $keyValuePairs
+    }) {
+        items {
+            key,
+            value
+        }
+    }
+}
