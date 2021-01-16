@@ -5,6 +5,8 @@ import { arrayToObjectMap } from './utils';
 async function run(): Promise<void> {
     try {
         const inputs = arrayToObjectMap([
+            "contentfulAccessToken",
+            "contentfulSpaceId",
             "headerKey",
             "subheaderKey",
             "footerKey",

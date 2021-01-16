@@ -47,7 +47,6 @@ const getApollo = (token, space) => new core_1.ApolloClient({
 function generateReadme(inputs) {
     return __awaiter(this, void 0, void 0, function* () {
         const octokit = new core_2.Octokit({ auth: process.env.GITHUB_TOKEN });
-        console.log(inputs["contentfulAccessToken"] + " " + inputs["contentfulSpaceId"]);
         const apolloClient = getApollo(inputs["contentfulAccessToken"], inputs["contentfulSpaceId"]);
         const keyValuePairs = utils_1.arrayToObjectMap(["header", "subheader", "footer"], item => item, item => inputs[item + "Key"]);
         const queryResult = yield apolloClient.query({ query: queries_1.README_QUERY, variables: {
@@ -175,6 +174,8 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const inputs = utils_1.arrayToObjectMap([
+                "contentfulAccessToken",
+                "contentfulSpaceId",
                 "headerKey",
                 "subheaderKey",
                 "footerKey",
