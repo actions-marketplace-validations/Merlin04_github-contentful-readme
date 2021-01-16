@@ -110,7 +110,7 @@ export default async function generateReadme(inputs: KeyValueStore) {
 ${queryKeyValuePairs["footer"]}
     `;
 
-    const results = await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
+    await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
         owner: username,
         repo: repo,
         path: inputs["path"],
