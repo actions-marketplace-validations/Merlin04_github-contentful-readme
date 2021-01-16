@@ -35,9 +35,10 @@ export default async function generateReadme(inputs: KeyValueStore) {
     const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
     const apolloClient = getApollo(inputs["contentfulAccessToken"], inputs["contentfulSpaceId"]);
-    const keyValuePairs = arrayToObjectMap(["header", "subheader", "footer"], item => item, item => inputs[item + "Key"]);
+    const keyValuePairs = arrayToObjectMap(["header", "subheader", "footer", "setOfProjectsCollectionId"], item => item, item => inputs[item + "Key"]);
     const queryResult = await apolloClient.query<ReadmeDataQuery>({ query: ReadmeData, variables: {
-        keyValuePairs: Object.keys(keyValuePairs)
+        keyValuePairs: Object.keys(keyValuePairs),
+        setOfProjectsCollectionId: inputs["setOfProjectsCollectionId"]
     }});
     console.log(`Requesting key-value pairs: ${JSON.stringify(keyValuePairs)}`);
     console.log(queryResult.data.keyValuePairCollection);
@@ -105,7 +106,24 @@ export default async function generateReadme(inputs: KeyValueStore) {
 # ${queryKeyValuePairs["header"]}
 
 ### ${queryKeyValuePairs["subheader"]}
-
+${queryKeyValuePairs["url"] !== undefined ? (
+`
+<table><tr><td><a href="${queryKeyValuePairs["url"]}"><img align="left" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/link-24px.svg">Go to website</a></td></tr></table>`
+) : ""}
+${inputs["setOfProjectsCollectionId"] !== undefined ? queryResult.data.setOfProjectsCollection?.items[0].featuredProjectsCollection.items.map(project => (
+`
+<table align="left"><tr><td width="400px">
+   <h3>${project.url !== undefined ? (
+       `<a href="${project.url}">${project.title}</a>`
+   ) : project.title }${project.codeUrl !== undefined ? (
+       `<a href="${project.codeUrl}"><img align="right" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/github-24px.svg"></a>`
+   ) : ""}</h3>
+   <p>${project.tagline}</p>
+   ${project.mediaCollection !== undefined ? (
+       `<img src="${project.mediaCollection?.items[0]?.url}">`
+   ) : ""}
+</td></tr></table>`
+)) : ""}
 
 ${queryKeyValuePairs["footer"]}
     `;

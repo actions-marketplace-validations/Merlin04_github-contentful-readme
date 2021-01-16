@@ -50,13 +50,14 @@ function throwUndefinedError(name) {
     return [];
 }
 function generateReadme(inputs) {
-    var _a, _b;
+    var _a, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
         const octokit = new core_2.Octokit({ auth: process.env.GITHUB_TOKEN });
         const apolloClient = getApollo(inputs["contentfulAccessToken"], inputs["contentfulSpaceId"]);
-        const keyValuePairs = utils_1.arrayToObjectMap(["header", "subheader", "footer"], item => item, item => inputs[item + "Key"]);
+        const keyValuePairs = utils_1.arrayToObjectMap(["header", "subheader", "footer", "setOfProjectsCollectionId"], item => item, item => inputs[item + "Key"]);
         const queryResult = yield apolloClient.query({ query: graphql_1.ReadmeData, variables: {
-                keyValuePairs: Object.keys(keyValuePairs)
+                keyValuePairs: Object.keys(keyValuePairs),
+                setOfProjectsCollectionId: inputs["setOfProjectsCollectionId"]
             } });
         console.log(`Requesting key-value pairs: ${JSON.stringify(keyValuePairs)}`);
         console.log(queryResult.data.keyValuePairCollection);
@@ -118,11 +119,21 @@ function generateReadme(inputs) {
 # ${queryKeyValuePairs["header"]}
 
 ### ${queryKeyValuePairs["subheader"]}
-
+${queryKeyValuePairs["url"] !== undefined ? (`
+<table><tr><td><a href="${queryKeyValuePairs["url"]}"><img align="left" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/link-24px.svg">Go to website</a></td></tr></table>`) : ""}
+${inputs["setOfProjectsCollectionId"] !== undefined ? (_c = queryResult.data.setOfProjectsCollection) === null || _c === void 0 ? void 0 : _c.items[0].featuredProjectsCollection.items.map(project => {
+            var _a, _b;
+            return (`
+<table align="left"><tr><td width="400px">
+   <h3>${project.url !== undefined ? (`<a href="${project.url}">${project.title}</a>`) : project.title}${project.codeUrl !== undefined ? (`<a href="${project.codeUrl}"><img align="right" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/github-24px.svg"></a>`) : ""}</h3>
+   <p>${project.tagline}</p>
+   ${project.mediaCollection !== undefined ? (`<img src="${(_b = (_a = project.mediaCollection) === null || _a === void 0 ? void 0 : _a.items[0]) === null || _b === void 0 ? void 0 : _b.url}">`) : ""}
+</td></tr></table>`);
+        }) : ""}
 
 ${queryKeyValuePairs["footer"]}
     `;
-        const results = yield octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
+        yield octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
             owner: username,
             repo: repo,
             path: inputs["path"],
@@ -146,7 +157,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ReadmeData = exports.SkillOrder = exports.KeyValuePairOrder = exports.SetOfProjectsOrder = exports.ProjectOrder = exports.AwardOrder = exports.PositionOrder = exports.AnnouncementOrder = exports.SetOfAnnouncementsOrder = exports.AssetOrder = exports.ImageFormat = exports.ImageResizeFocus = exports.ImageResizeStrategy = void 0;
+exports.ReadmeData = exports.PositionReadme = exports.FeaturedProject = exports.SkillOrder = exports.KeyValuePairOrder = exports.SetOfProjectsOrder = exports.ProjectOrder = exports.AwardOrder = exports.PositionOrder = exports.AnnouncementOrder = exports.SetOfAnnouncementsOrder = exports.AssetOrder = exports.ImageFormat = exports.ImageResizeFocus = exports.ImageResizeStrategy = void 0;
 const graphql_tag_1 = __importDefault(__nccwpck_require__(8377));
 var ImageResizeStrategy;
 (function (ImageResizeStrategy) {
@@ -363,16 +374,55 @@ var SkillOrder;
     SkillOrder["SysPublishedVersionAsc"] = "sys_publishedVersion_ASC";
     SkillOrder["SysPublishedVersionDesc"] = "sys_publishedVersion_DESC";
 })(SkillOrder = exports.SkillOrder || (exports.SkillOrder = {}));
+exports.FeaturedProject = graphql_tag_1.default `
+    fragment FeaturedProject on Project {
+  title
+  url
+  codeUrl
+  tagline
+  mediaCollection(limit: 1) {
+    items {
+      title
+      width
+      height
+      url(transform: {format: WEBP, width: 800, quality: 50})
+    }
+  }
+}
+    `;
+exports.PositionReadme = graphql_tag_1.default `
+    fragment PositionReadme on Position {
+  company
+  companyUrl
+  position
+  startDate
+}
+    `;
 exports.ReadmeData = graphql_tag_1.default `
-    query ReadmeData($keyValuePairs: [String]) {
+    query ReadmeData($keyValuePairs: [String], $setOfProjectsCollectionId: String) {
   keyValuePairCollection(where: {key_in: $keyValuePairs}) {
     items {
       key
       value
     }
   }
+  setOfProjectsCollection(where: {id: $setOfProjectsCollectionId}, limit: 1) {
+    items {
+      featuredProjectsCollection {
+        items {
+          ...FeaturedProject
+        }
+      }
+    }
+  }
+  positionCollection {
+    items {
+      ...PositionReadme
+    }
+  }
 }
-    `;
+    ${exports.FeaturedProject}
+${exports.PositionReadme}`;
 
 
 /***/ }),

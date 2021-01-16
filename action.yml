@@ -21,6 +21,14 @@ inputs:
     description: 'The name of the Key-Value pair in Contentful with the footer text'
     required: false
     default: ''
+  setOfProjectsCollectionId:
+    description: 'The ID of the set of projects in Contentful to display',
+    required: false,
+    default: ''
+  urlKey:
+    description: 'The name of the Key-Value pair in Contentful with a URL for a website to link to'
+    required: false
+    default: ''
   path:
     description: 'Path of your README.md file.'
     required: false

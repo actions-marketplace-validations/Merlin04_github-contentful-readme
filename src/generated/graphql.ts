@@ -1520,6 +1520,7 @@ export type SkillCollection = {
 
 export type ReadmeDataQueryVariables = Exact<{
   keyValuePairs?: Maybe<Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>>;
+  setOfProjectsCollectionId?: Maybe<Scalars['String']>;
 }>;
 
 
@@ -1531,17 +1532,90 @@ export type ReadmeDataQuery = (
       { __typename?: 'KeyValuePair' }
       & Pick<KeyValuePair, 'key' | 'value'>
     )> }
+  )>, setOfProjectsCollection?: Maybe<(
+    { __typename?: 'SetOfProjectsCollection' }
+    & { items: Array<(
+      { __typename?: 'SetOfProjects' }
+      & { featuredProjectsCollection: (
+        { __typename?: 'SetOfProjectsFeaturedProjectsCollection' }
+        & { items: Array<(
+          { __typename?: 'Project' }
+          & FeaturedProjectFragment
+        )> }
+      ) }
+    )> }
+  )>, positionCollection?: Maybe<(
+    { __typename?: 'PositionCollection' }
+    & { items: Array<(
+      { __typename?: 'Position' }
+      & PositionReadmeFragment
+    )> }
   )> }
 );
 
+export type FeaturedProjectFragment = (
+  { __typename?: 'Project' }
+  & Pick<Project, 'title' | 'url' | 'codeUrl' | 'tagline'>
+  & { mediaCollection?: Maybe<(
+    { __typename?: 'AssetCollection' }
+    & { items: Array<Maybe<(
+      { __typename?: 'Asset' }
+      & Pick<Asset, 'title' | 'width' | 'height' | 'url'>
+    )>> }
+  )> }
+);
 
+export type PositionReadmeFragment = (
+  { __typename?: 'Position' }
+  & Pick<Position, 'company' | 'companyUrl' | 'position' | 'startDate'>
+);
+
+export const FeaturedProject = gql`
+    fragment FeaturedProject on Project {
+  title
+  url
+  codeUrl
+  tagline
+  mediaCollection(limit: 1) {
+    items {
+      title
+      width
+      height
+      url(transform: {format: WEBP, width: 800, quality: 50})
+    }
+  }
+}
+    `;
+export const PositionReadme = gql`
+    fragment PositionReadme on Position {
+  company
+  companyUrl
+  position
+  startDate
+}
+    `;
 export const ReadmeData = gql`
-    query ReadmeData($keyValuePairs: [String]) {
+    query ReadmeData($keyValuePairs: [String], $setOfProjectsCollectionId: String) {
   keyValuePairCollection(where: {key_in: $keyValuePairs}) {
     items {
       key
       value
     }
   }
+  setOfProjectsCollection(where: {id: $setOfProjectsCollectionId}, limit: 1) {
+    items {
+      featuredProjectsCollection {
+        items {
+          ...FeaturedProject
+        }
+      }
+    }
+  }
+  positionCollection {
+    items {
+      ...PositionReadme
+    }
+  }
 }
-    `;
+    ${FeaturedProject}
+${PositionReadme}`;

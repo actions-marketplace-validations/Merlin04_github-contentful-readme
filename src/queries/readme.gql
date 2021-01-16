@@ -1,4 +1,4 @@
-query ReadmeData($keyValuePairs: [String]) {
+query ReadmeData($keyValuePairs: [String], $setOfProjectsCollectionId: String) {
     keyValuePairCollection(where: {
         key_in: $keyValuePairs
     }) {
@@ -6,5 +6,47 @@ query ReadmeData($keyValuePairs: [String]) {
             key,
             value
         }
+    },
+    setOfProjectsCollection(where: {
+        id: $setOfProjectsCollectionId
+    }, limit: 1) {
+        items {
+            featuredProjectsCollection {
+                items {
+                    ...FeaturedProject
+                }
+            }
+        }
     }
+    positionCollection {
+        items {
+            ...PositionReadme
+        }
+    }
+}
+
+fragment FeaturedProject on Project {
+    title,
+    url,
+    codeUrl,
+    tagline,
+    mediaCollection(limit: 1) {
+        items {
+            title,
+            width,
+            height,
+            url(transform: {
+                format: WEBP,
+                width: 800,,
+                quality: 50
+            })
+        }
+    }
+}
+
+fragment PositionReadme on Position {
+    company,
+    companyUrl,
+    position,
+    startDate
 }
