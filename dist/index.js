@@ -50,7 +50,7 @@ function generateReadme(inputs) {
         const apolloClient = getApollo(inputs["contentfulAccessToken"], inputs["contentfulSpaceId"]);
         const keyValuePairs = utils_1.arrayToObjectMap(["header", "subheader", "footer"], item => item, item => inputs[item + "Key"]);
         const queryResult = yield apolloClient.query({ query: queries_1.README_QUERY, variables: {
-                keyValuePairs: Object.values(keyValuePairs)
+                keyValuePairs: Object.keys(keyValuePairs)
             } });
         console.log(`Requesting key-value pairs: ${JSON.stringify(keyValuePairs)}`);
         console.log(queryResult);
