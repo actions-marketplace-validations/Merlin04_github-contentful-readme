@@ -52,6 +52,8 @@ function generateReadme(inputs) {
         const queryResult = yield apolloClient.query({ query: queries_1.README_QUERY, variables: {
                 keyValuePairs: Object.values(keyValuePairs)
             } });
+        console.log(`Requesting key-value pairs: ${keyValuePairs}`);
+        console.log(queryResult);
         const queryKeyValuePairs = utils_1.arrayToObjectMap(queryResult.data.items, kvp => kvp.value, kvp => keyValuePairs[kvp.key]);
         /*const queryKeyValuePairs = queryResult.data.items.map(item => ({
             [item.key]: item.value

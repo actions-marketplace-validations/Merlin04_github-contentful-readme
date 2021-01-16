@@ -27,12 +27,14 @@ const getApollo = (token: string, space: string) => new ApolloClient({
 
 export default async function generateReadme(inputs: KeyValueStore) {
     const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-    
+
     const apolloClient = getApollo(inputs["contentfulAccessToken"], inputs["contentfulSpaceId"]);
     const keyValuePairs = arrayToObjectMap(["header", "subheader", "footer"], item => item, item => inputs[item + "Key"]);
     const queryResult = await apolloClient.query<ReadmeQuery>({ query: README_QUERY, variables: {
         keyValuePairs: Object.values(keyValuePairs)
     }});
+    console.log(`Requesting key-value pairs: ${keyValuePairs}`);
+    console.log(queryResult);
     const queryKeyValuePairs = arrayToObjectMap(queryResult.data.items, kvp => kvp.value, kvp => keyValuePairs[kvp.key]);
     /*const queryKeyValuePairs = queryResult.data.items.map(item => ({
         [item.key]: item.value
