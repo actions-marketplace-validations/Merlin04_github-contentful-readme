@@ -22,7 +22,7 @@ function ItemTable(items, colCount, colWidth) {
             result += TR_OPEN;
         }
         result += `
-<td${colWidth !== undefined ? ` width="${colWidth}px"` : ``}>${items[i]}</td>`;
+<td valign="top"${colWidth !== undefined ? ` width="${colWidth}px"` : ``}>${items[i]}</td>`;
     }
     result += TR_CLOSE;
     return result + `
@@ -43,7 +43,7 @@ function ProjectCell(project) {
     var _a, _b;
     return (`<h3>${project.url !== undefined ? (`<a href="${project.url}">${project.title}</a>`) : project.title}${project.codeUrl !== undefined ? (`<a href="${project.codeUrl}"><img align="right" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/github-24px.svg"></a>`) : ""}</h3>
         <p>${project.tagline}</p>
-        ${project.mediaCollection !== undefined ? (`<img src="${(_b = (_a = project.mediaCollection) === null || _a === void 0 ? void 0 : _a.items[0]) === null || _b === void 0 ? void 0 : _b.url}">`) : ""}`);
+        ${((_b = (_a = project.mediaCollection) === null || _a === void 0 ? void 0 : _a.items[0]) === null || _b === void 0 ? void 0 : _b.url) !== undefined ? `<img src="${project.mediaCollection.items[0].url}">` : ""}`);
 }
 exports.default = ProjectCell;
 
@@ -202,7 +202,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ReadmeData = exports.PositionReadme = exports.FeaturedProject = exports.SkillOrder = exports.KeyValuePairOrder = exports.SetOfProjectsOrder = exports.ProjectOrder = exports.AwardOrder = exports.PositionOrder = exports.AnnouncementOrder = exports.SetOfAnnouncementsOrder = exports.AssetOrder = exports.ImageFormat = exports.ImageResizeFocus = exports.ImageResizeStrategy = void 0;
+exports.ReadmeData = exports.PositionReadme = exports.FeaturedProject = exports.ProjectMedia = exports.SkillOrder = exports.KeyValuePairOrder = exports.SetOfProjectsOrder = exports.ProjectOrder = exports.AwardOrder = exports.PositionOrder = exports.AnnouncementOrder = exports.SetOfAnnouncementsOrder = exports.AssetOrder = exports.ImageFormat = exports.ImageResizeFocus = exports.ImageResizeStrategy = void 0;
 const graphql_tag_1 = __importDefault(__nccwpck_require__(8377));
 var ImageResizeStrategy;
 (function (ImageResizeStrategy) {
@@ -419,6 +419,14 @@ var SkillOrder;
     SkillOrder["SysPublishedVersionAsc"] = "sys_publishedVersion_ASC";
     SkillOrder["SysPublishedVersionDesc"] = "sys_publishedVersion_DESC";
 })(SkillOrder = exports.SkillOrder || (exports.SkillOrder = {}));
+exports.ProjectMedia = graphql_tag_1.default `
+    fragment ProjectMedia on Asset {
+  title
+  width
+  height
+  url(transform: {format: WEBP, height: 400, quality: 50})
+}
+    `;
 exports.FeaturedProject = graphql_tag_1.default `
     fragment FeaturedProject on Project {
   title
@@ -427,14 +435,11 @@ exports.FeaturedProject = graphql_tag_1.default `
   tagline
   mediaCollection(limit: 1) {
     items {
-      title
-      width
-      height
-      url(transform: {format: WEBP, width: 800, quality: 50})
+      ...ProjectMedia
     }
   }
 }
-    `;
+    ${exports.ProjectMedia}`;
 exports.PositionReadme = graphql_tag_1.default `
     fragment PositionReadme on Position {
   company
