@@ -39,20 +39,28 @@ exports.default = ItemTable;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-function generateImageTag(image, maxHeight) {
+// px
+const imageMaxHeight = 300;
+// The width of the contents of a table cell is 27px less than the td element's width
+const cellWidthDifference = 27;
+function generateImageTag(image, maxHeight, containerWidth) {
     if (!image.width || !image.height)
         throw new Error("Image width or height is undefined");
     let result = `<img src="${image.url}"`;
-    if (image.height > maxHeight) {
+    // If the image doesn't fit within the maxHeight without resizing,
+    // and if the image with height set to maxHeight would fit in the container
+    // (otherwise the width would be automatically scaled to fit the container,
+    // and the scaled height would be less than maxHeight)
+    if (image.height > maxHeight && (image.width / image.height) * maxHeight <= containerWidth) {
         result += ` height=${maxHeight}`;
     }
     return result + ">";
 }
-function ProjectCell(project) {
+function ProjectCell(project, cellWidth) {
     var _a, _b;
     return (`<h3>${project.url !== undefined ? (`<a href="${project.url}">${project.title}</a>`) : project.title}${project.codeUrl !== undefined ? (`<a href="${project.codeUrl}"><img align="right" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/github-24px.svg"></a>`) : ""}</h3>
         <p>${project.tagline}</p>
-        ${((_b = (_a = project.mediaCollection) === null || _a === void 0 ? void 0 : _a.items[0]) === null || _b === void 0 ? void 0 : _b.url) !== undefined ? generateImageTag(project.mediaCollection.items[0], 300) : ""}`);
+        ${((_b = (_a = project.mediaCollection) === null || _a === void 0 ? void 0 : _a.items[0]) === null || _b === void 0 ? void 0 : _b.url) !== undefined ? generateImageTag(project.mediaCollection.items[0], imageMaxHeight, cellWidth - cellWidthDifference) : ""}`);
 }
 exports.default = ProjectCell;
 
@@ -183,7 +191,7 @@ function generateReadme(inputs) {
 ${queryKeyValuePairs["url"] !== undefined ? (`
 <table><tr><td><a href="${queryKeyValuePairs["url"]}"><img align="left" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/link-24px.svg">Go to website</a></td></tr></table>`) : ""}
 ${inputs["setOfProjectsCollectionId"] !== undefined && queryResult.data.setOfProjectsCollection
-            ? "\n" + ItemTable_1.default(queryResult.data.setOfProjectsCollection.items[0].featuredProjectsCollection.items.map(ProjectCell_1.default), 2, 400) : ""}
+            ? "\n" + ItemTable_1.default(queryResult.data.setOfProjectsCollection.items[0].featuredProjectsCollection.items.map(project => ProjectCell_1.default(project, 400)), 2, 400) : ""}
 
 ${queryKeyValuePairs["footer"]}
     `;

@@ -115,7 +115,7 @@ ${queryKeyValuePairs["url"] !== undefined ? (
 <table><tr><td><a href="${queryKeyValuePairs["url"]}"><img align="left" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/link-24px.svg">Go to website</a></td></tr></table>`
 ) : ""}
 ${inputs["setOfProjectsCollectionId"] !== undefined && queryResult.data.setOfProjectsCollection
-    ? "\n" + ItemTable(queryResult.data.setOfProjectsCollection.items[0].featuredProjectsCollection.items.map(ProjectCell), 2, 400) : ""}
+    ? "\n" + ItemTable(queryResult.data.setOfProjectsCollection.items[0].featuredProjectsCollection.items.map(project => ProjectCell(project, 400)), 2, 400) : ""}
 
 ${queryKeyValuePairs["footer"]}
     `;
