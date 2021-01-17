@@ -7,15 +7,15 @@ const cellWidthDifference = 27;
 
 function generateImageTag(image: ProjectMediaFragment, maxHeight: number, containerWidth: number) {
     if(!image.width || !image.height) throw new Error("Image width or height is undefined");
-    let result = `<img src="${image.url}"`;
+    let result = `<img src="${image.url}">`;
     // If the image doesn't fit within the maxHeight without resizing,
     // and if the image with height set to maxHeight would fit in the container
     // (otherwise the width would be automatically scaled to fit the container,
     // and the scaled height would be less than maxHeight)
     if(image.height > maxHeight && (image.width / image.height) * maxHeight <= containerWidth) {
-        result += ` height=${maxHeight}`;
+        result = `<div height="${maxHeight}px">${result}</div>`;
     } 
-    return result + ">";
+    return result;
 }
 
 export default function ProjectCell(project: FeaturedProjectFragment, cellWidth: number) {
