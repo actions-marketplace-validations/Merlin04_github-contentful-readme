@@ -39,11 +39,20 @@ exports.default = ItemTable;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+function generateImageTag(image, maxHeight) {
+    if (!image.width || !image.height)
+        throw new Error("Image width or height is undefined");
+    let result = `<img src="${image.url}"`;
+    if (image.height > maxHeight) {
+        result += ` height=${maxHeight}`;
+    }
+    return result + ">";
+}
 function ProjectCell(project) {
     var _a, _b;
     return (`<h3>${project.url !== undefined ? (`<a href="${project.url}">${project.title}</a>`) : project.title}${project.codeUrl !== undefined ? (`<a href="${project.codeUrl}"><img align="right" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/github-24px.svg"></a>`) : ""}</h3>
         <p>${project.tagline}</p>
-        ${((_b = (_a = project.mediaCollection) === null || _a === void 0 ? void 0 : _a.items[0]) === null || _b === void 0 ? void 0 : _b.url) !== undefined ? `<img src="${project.mediaCollection.items[0].url}">` : ""}`);
+        ${((_b = (_a = project.mediaCollection) === null || _a === void 0 ? void 0 : _a.items[0]) === null || _b === void 0 ? void 0 : _b.url) !== undefined ? generateImageTag(project.mediaCollection.items[0], 300) : ""}`);
 }
 exports.default = ProjectCell;
 
@@ -424,7 +433,7 @@ exports.ProjectMedia = graphql_tag_1.default `
   title
   width
   height
-  url(transform: {format: WEBP, height: 400, quality: 50})
+  url(transform: {format: WEBP, height: 600, quality: 50})
 }
     `;
 exports.FeaturedProject = graphql_tag_1.default `

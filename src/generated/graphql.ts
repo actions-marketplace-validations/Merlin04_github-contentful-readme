@@ -1581,7 +1581,7 @@ export const ProjectMedia = gql`
   title
   width
   height
-  url(transform: {format: WEBP, height: 400, quality: 50})
+  url(transform: {format: WEBP, height: 600, quality: 50})
 }
     `;
 export const FeaturedProject = gql`

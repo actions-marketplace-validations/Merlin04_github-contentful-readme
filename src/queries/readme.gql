@@ -43,7 +43,7 @@ fragment ProjectMedia on Asset {
     height,
     url(transform: {
         format: WEBP,
-        height: 400,
+        height: 600,
         quality: 50
     })
 }
