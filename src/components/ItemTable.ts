@@ -15,7 +15,7 @@ export default function ItemTable(items: string[], colCount: number, colWidth?: 
             result += TR_OPEN
         }
         result += `
-<td${colWidth !== undefined ? ` width="${colWidth}px"` : ``}>${items[i]}</td>`;
+<td valign="top"${colWidth !== undefined ? ` width="${colWidth}px"` : ``}>${items[i]}</td>`;
     }
     result += TR_CLOSE;
 

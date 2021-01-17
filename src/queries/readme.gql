@@ -32,16 +32,20 @@ fragment FeaturedProject on Project {
     tagline,
     mediaCollection(limit: 1) {
         items {
-            title,
-            width,
-            height,
-            url(transform: {
-                format: WEBP,
-                width: 800,,
-                quality: 50
-            })
+            ...ProjectMedia
         }
     }
+}
+
+fragment ProjectMedia on Asset {
+    title,
+    width,
+    height,
+    url(transform: {
+        format: WEBP,
+        height: 400,
+        quality: 50
+    })
 }
 
 fragment PositionReadme on Position {

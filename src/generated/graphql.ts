@@ -1561,9 +1561,14 @@ export type FeaturedProjectFragment = (
     { __typename?: 'AssetCollection' }
     & { items: Array<Maybe<(
       { __typename?: 'Asset' }
-      & Pick<Asset, 'title' | 'width' | 'height' | 'url'>
+      & ProjectMediaFragment
     )>> }
   )> }
+);
+
+export type ProjectMediaFragment = (
+  { __typename?: 'Asset' }
+  & Pick<Asset, 'title' | 'width' | 'height' | 'url'>
 );
 
 export type PositionReadmeFragment = (
@@ -1571,6 +1576,14 @@ export type PositionReadmeFragment = (
   & Pick<Position, 'company' | 'companyUrl' | 'position' | 'startDate'>
 );
 
+export const ProjectMedia = gql`
+    fragment ProjectMedia on Asset {
+  title
+  width
+  height
+  url(transform: {format: WEBP, height: 400, quality: 50})
+}
+    `;
 export const FeaturedProject = gql`
     fragment FeaturedProject on Project {
   title
@@ -1579,14 +1592,11 @@ export const FeaturedProject = gql`
   tagline
   mediaCollection(limit: 1) {
     items {
-      title
-      width
-      height
-      url(transform: {format: WEBP, width: 800, quality: 50})
+      ...ProjectMedia
     }
   }
 }
-    `;
+    ${ProjectMedia}`;
 export const PositionReadme = gql`
     fragment PositionReadme on Position {
   company
