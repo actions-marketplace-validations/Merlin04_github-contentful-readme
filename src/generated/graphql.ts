@@ -1521,6 +1521,7 @@ export type SkillCollection = {
 export type ReadmeDataQueryVariables = Exact<{
   keyValuePairs?: Maybe<Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>>;
   setOfProjectsCollectionId?: Maybe<Scalars['String']>;
+  projectsLimit?: Maybe<Scalars['Int']>;
 }>;
 
 
@@ -1595,7 +1596,7 @@ export const PositionReadme = gql`
 }
     `;
 export const ReadmeData = gql`
-    query ReadmeData($keyValuePairs: [String], $setOfProjectsCollectionId: String) {
+    query ReadmeData($keyValuePairs: [String], $setOfProjectsCollectionId: String, $projectsLimit: Int) {
   keyValuePairCollection(where: {key_in: $keyValuePairs}) {
     items {
       key
@@ -1604,7 +1605,7 @@ export const ReadmeData = gql`
   }
   setOfProjectsCollection(where: {id: $setOfProjectsCollectionId}, limit: 1) {
     items {
-      featuredProjectsCollection {
+      featuredProjectsCollection(limit: $projectsLimit) {
         items {
           ...FeaturedProject
         }

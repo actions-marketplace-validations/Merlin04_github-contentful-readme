@@ -29,6 +29,10 @@ inputs:
     description: 'The name of the Key-Value pair in Contentful with a URL for a website to link to'
     required: false
     default: ''
+  projectsLimit:
+    description: 'The limit of the number of projects to display'
+    required: false
+    default: ''
   path:
     description: 'Path of your README.md file.'
     required: false

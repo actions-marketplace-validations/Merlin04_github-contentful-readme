@@ -1,7 +1,9 @@
 import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client/core';
 import { Octokit } from '@octokit/core';
 import fetch from 'cross-fetch';
-import { ReadmeData, ReadmeDataQuery } from './generated/graphql';
+import ItemTable from './components/ItemTable';
+import ProjectCell from './components/ProjectCell';
+import { ReadmeData, ReadmeDataQuery, ReadmeDataQueryVariables } from './generated/graphql';
 import { KeyValueStore, arrayToObjectMap } from './utils';
 
 const chunkArray = <T>(array: T[], size: number) => {
@@ -36,9 +38,10 @@ export default async function generateReadme(inputs: KeyValueStore) {
 
     const apolloClient = getApollo(inputs["contentfulAccessToken"], inputs["contentfulSpaceId"]);
     const keyValuePairs = arrayToObjectMap(["header", "subheader", "footer", "url"], item => item, item => inputs[item + "Key"]);
-    const queryResult = await apolloClient.query<ReadmeDataQuery>({ query: ReadmeData, variables: {
+    const queryResult = await apolloClient.query<ReadmeDataQuery, ReadmeDataQueryVariables>({ query: ReadmeData, variables: {
         keyValuePairs: Object.keys(keyValuePairs),
-        setOfProjectsCollectionId: inputs["setOfProjectsCollectionId"]
+        setOfProjectsCollectionId: inputs["setOfProjectsCollectionId"],
+        projectsLimit: parseInt(inputs["projectsLimit"])
     }});
     console.log(`Requesting key-value pairs: ${JSON.stringify(keyValuePairs)}`);
     console.log(queryResult.data.keyValuePairCollection);
@@ -111,20 +114,8 @@ ${queryKeyValuePairs["url"] !== undefined ? (
 `
 <table><tr><td><a href="${queryKeyValuePairs["url"]}"><img align="left" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/link-24px.svg">Go to website</a></td></tr></table>`
 ) : ""}
-${inputs["setOfProjectsCollectionId"] !== undefined ? queryResult.data.setOfProjectsCollection?.items[0].featuredProjectsCollection.items.map(project => (
-`
-<table align="left"><tr><td width="400px">
-   <h3>${project.url !== undefined ? (
-       `<a href="${project.url}">${project.title}</a>`
-   ) : project.title }${project.codeUrl !== undefined ? (
-       `<a href="${project.codeUrl}"><img align="right" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/github-24px.svg"></a>`
-   ) : ""}</h3>
-   <p>${project.tagline}</p>
-   ${project.mediaCollection !== undefined ? (
-       `<img src="${project.mediaCollection?.items[0]?.url}">`
-   ) : ""}
-</td></tr></table>`
-)).reduce((prev, cur) => prev + cur) : ""}
+${inputs["setOfProjectsCollectionId"] !== undefined && queryResult.data.setOfProjectsCollection
+    ? "\n" + ItemTable(queryResult.data.setOfProjectsCollection.items[0].featuredProjectsCollection.items.map(ProjectCell), 2, 400) : ""}
 
 ${queryKeyValuePairs["footer"]}
     `;

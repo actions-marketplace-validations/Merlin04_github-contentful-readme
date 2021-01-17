@@ -2,6 +2,54 @@ module.exports =
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 1543:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const TR_CLOSE = `
+</tr>`;
+const TR_OPEN = `
+<tr>`;
+function ItemTable(items, colCount, colWidth) {
+    let result = `<table>`;
+    for (let i = 0; i < items.length; i++) {
+        if (i % colCount === 0) {
+            if (i !== 0) {
+                result += TR_CLOSE;
+            }
+            result += TR_OPEN;
+        }
+        result += `
+<td${colWidth !== undefined ? ` width="${colWidth}px"` : ``}>${items[i]}</td>`;
+    }
+    result += TR_CLOSE;
+    return result + `
+</table>`;
+}
+exports.default = ItemTable;
+
+
+/***/ }),
+
+/***/ 3903:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+function ProjectCell(project) {
+    var _a, _b;
+    return (`<h3>${project.url !== undefined ? (`<a href="${project.url}">${project.title}</a>`) : project.title}${project.codeUrl !== undefined ? (`<a href="${project.codeUrl}"><img align="right" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/github-24px.svg"></a>`) : ""}</h3>
+        <p>${project.tagline}</p>
+        ${project.mediaCollection !== undefined ? (`<img src="${(_b = (_a = project.mediaCollection) === null || _a === void 0 ? void 0 : _a.items[0]) === null || _b === void 0 ? void 0 : _b.url}">`) : ""}`);
+}
+exports.default = ProjectCell;
+
+
+/***/ }),
+
 /***/ 2092:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -23,6 +71,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(9900);
 const core_2 = __nccwpck_require__(6762);
 const cross_fetch_1 = __importDefault(__nccwpck_require__(9805));
+const ItemTable_1 = __importDefault(__nccwpck_require__(1543));
+const ProjectCell_1 = __importDefault(__nccwpck_require__(3903));
 const graphql_1 = __nccwpck_require__(9088);
 const utils_1 = __nccwpck_require__(918);
 const chunkArray = (array, size) => {
@@ -50,14 +100,15 @@ function throwUndefinedError(name) {
     return [];
 }
 function generateReadme(inputs) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
         const octokit = new core_2.Octokit({ auth: process.env.GITHUB_TOKEN });
         const apolloClient = getApollo(inputs["contentfulAccessToken"], inputs["contentfulSpaceId"]);
         const keyValuePairs = utils_1.arrayToObjectMap(["header", "subheader", "footer", "url"], item => item, item => inputs[item + "Key"]);
         const queryResult = yield apolloClient.query({ query: graphql_1.ReadmeData, variables: {
                 keyValuePairs: Object.keys(keyValuePairs),
-                setOfProjectsCollectionId: inputs["setOfProjectsCollectionId"]
+                setOfProjectsCollectionId: inputs["setOfProjectsCollectionId"],
+                projectsLimit: parseInt(inputs["projectsLimit"])
             } });
         console.log(`Requesting key-value pairs: ${JSON.stringify(keyValuePairs)}`);
         console.log(queryResult.data.keyValuePairCollection);
@@ -122,15 +173,8 @@ function generateReadme(inputs) {
 ### ${queryKeyValuePairs["subheader"]}
 ${queryKeyValuePairs["url"] !== undefined ? (`
 <table><tr><td><a href="${queryKeyValuePairs["url"]}"><img align="left" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/link-24px.svg">Go to website</a></td></tr></table>`) : ""}
-${inputs["setOfProjectsCollectionId"] !== undefined ? (_d = queryResult.data.setOfProjectsCollection) === null || _d === void 0 ? void 0 : _d.items[0].featuredProjectsCollection.items.map(project => {
-            var _a, _b;
-            return (`
-<table align="left"><tr><td width="400px">
-   <h3>${project.url !== undefined ? (`<a href="${project.url}">${project.title}</a>`) : project.title}${project.codeUrl !== undefined ? (`<a href="${project.codeUrl}"><img align="right" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/github-24px.svg"></a>`) : ""}</h3>
-   <p>${project.tagline}</p>
-   ${project.mediaCollection !== undefined ? (`<img src="${(_b = (_a = project.mediaCollection) === null || _a === void 0 ? void 0 : _a.items[0]) === null || _b === void 0 ? void 0 : _b.url}">`) : ""}
-</td></tr></table>`);
-        }).reduce((prev, cur) => prev + cur) : ""}
+${inputs["setOfProjectsCollectionId"] !== undefined && queryResult.data.setOfProjectsCollection
+            ? "\n" + ItemTable_1.default(queryResult.data.setOfProjectsCollection.items[0].featuredProjectsCollection.items.map(ProjectCell_1.default), 2, 400) : ""}
 
 ${queryKeyValuePairs["footer"]}
     `;
@@ -400,7 +444,7 @@ exports.PositionReadme = graphql_tag_1.default `
 }
     `;
 exports.ReadmeData = graphql_tag_1.default `
-    query ReadmeData($keyValuePairs: [String], $setOfProjectsCollectionId: String) {
+    query ReadmeData($keyValuePairs: [String], $setOfProjectsCollectionId: String, $projectsLimit: Int) {
   keyValuePairCollection(where: {key_in: $keyValuePairs}) {
     items {
       key
@@ -409,7 +453,7 @@ exports.ReadmeData = graphql_tag_1.default `
   }
   setOfProjectsCollection(where: {id: $setOfProjectsCollectionId}, limit: 1) {
     items {
-      featuredProjectsCollection {
+      featuredProjectsCollection(limit: $projectsLimit) {
         items {
           ...FeaturedProject
         }
@@ -479,6 +523,7 @@ function run() {
                 "footerKey",
                 "urlKey",
                 "setOfProjectsCollectionId",
+                "projectsLimit",
                 "path",
                 "ref",
                 "imageSize",

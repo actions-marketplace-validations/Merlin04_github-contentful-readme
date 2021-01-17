@@ -12,6 +12,7 @@ async function run(): Promise<void> {
             "footerKey",
             "urlKey",
             "setOfProjectsCollectionId",
+            "projectsLimit",
             "path",
             "ref",
             "imageSize",
