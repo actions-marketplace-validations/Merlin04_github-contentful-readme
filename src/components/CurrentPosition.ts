@@ -25,6 +25,6 @@ function sortItemsByDate<T>(items: T[], getDateProperty: {(item: T): string}) {
 export default function CurrentPosition(positions: PositionReadmeFragment[]) {
     const latestPosition = sortItemsByDate(positions, position => position.startDate)[0];
 
-    return `<img align="left" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/business-24px.svg">${latestPosition.position} at&nbsp;
+    return `<img align="left" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/business-24px.svg">${latestPosition.position} at
 ${latestPosition.companyUrl ? `<a href="${latestPosition.companyUrl}">${latestPosition.company}</a>` : latestPosition.company}`;
 }

@@ -30,7 +30,7 @@ function sortItemsByDate(items, getDateProperty) {
 }
 function CurrentPosition(positions) {
     const latestPosition = sortItemsByDate(positions, position => position.startDate)[0];
-    return `<img align="left" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/business-24px.svg">${latestPosition.position} at&nbsp;
+    return `<img align="left" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/business-24px.svg">${latestPosition.position} at
 ${latestPosition.companyUrl ? `<a href="${latestPosition.companyUrl}">${latestPosition.company}</a>` : latestPosition.company}`;
 }
 exports.default = CurrentPosition;
@@ -99,7 +99,7 @@ function generateImageTag(image, maxHeight, containerWidth) {
 }
 function ProjectCell(project, cellWidth) {
     var _a, _b;
-    return (`<h3>${project.url !== undefined ? (`<a href="${project.url}">${project.title}</a>`) : project.title}${project.codeUrl !== undefined ? (`<a href="${project.codeUrl}"><img align="right" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/github-24px.svg"></a>`) : ""}</h3>
+    return (`<h3>${project.url ? (`<a href="${project.url}">${project.title}</a>`) : project.title}${project.codeUrl ? (`<a href="${project.codeUrl}"><img align="right" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/github-24px.svg"></a>`) : ""}</h3>
         <p>${project.tagline}</p>
         ${((_b = (_a = project.mediaCollection) === null || _a === void 0 ? void 0 : _a.items[0]) === null || _b === void 0 ? void 0 : _b.url) !== undefined ? generateImageTag(project.mediaCollection.items[0], imageMaxHeight, cellWidth - cellWidthDifference) : ""}`);
 }

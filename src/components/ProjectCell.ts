@@ -26,9 +26,9 @@ function generateImageTag(image: ProjectMediaFragment, maxHeight: number, contai
 
 export default function ProjectCell(project: FeaturedProjectFragment, cellWidth: number) {
     return (
-        `<h3>${project.url !== undefined ? (
+        `<h3>${project.url ? (
             `<a href="${project.url}">${project.title}</a>`
-        ) : project.title }${project.codeUrl !== undefined ? (
+        ) : project.title }${project.codeUrl ? (
             `<a href="${project.codeUrl}"><img align="right" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/github-24px.svg"></a>`
         ) : ""}</h3>
         <p>${project.tagline}</p>
