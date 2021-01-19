@@ -2,6 +2,42 @@ module.exports =
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 6524:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+function parseStringDate(date) {
+    const split = date.split('/');
+    switch (split.length) {
+        case 3: {
+            return new Date(date);
+        }
+        case 2: {
+            return new Date([split[0], "1", split[1]].join('/'));
+        }
+        case 1: {
+            return new Date("01/01/" + split[0]);
+        }
+        default: {
+            throw new Error("Invalid date format: " + date);
+        }
+    }
+}
+function sortItemsByDate(items, getDateProperty) {
+    return items.slice().sort((a, b) => +parseStringDate(getDateProperty(b)) - +parseStringDate(getDateProperty(a)));
+}
+function CurrentPosition(positions) {
+    const latestPosition = sortItemsByDate(positions, position => position.startDate)[0];
+    return `<img align="left" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/business-24px.svg">${latestPosition.position} at&nbsp;
+${latestPosition.companyUrl ? `<a href="${latestPosition.companyUrl}">${latestPosition.company}</a>` : latestPosition.company}`;
+}
+exports.default = CurrentPosition;
+
+
+/***/ }),
+
 /***/ 1543:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -93,19 +129,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(9900);
 const core_2 = __nccwpck_require__(6762);
 const cross_fetch_1 = __importDefault(__nccwpck_require__(9805));
+const CurrentPosition_1 = __importDefault(__nccwpck_require__(6524));
 const ItemTable_1 = __importDefault(__nccwpck_require__(1543));
 const ProjectCell_1 = __importDefault(__nccwpck_require__(3903));
 const graphql_1 = __nccwpck_require__(9088);
 const utils_1 = __nccwpck_require__(918);
-const chunkArray = (array, size) => {
-    let chunked = [];
-    let index = 0;
-    while (index < array.length) {
-        chunked.push(array.slice(index, size + index));
-        index += size;
-    }
-    return chunked;
-};
 const getApollo = (token, space) => new core_1.ApolloClient({
     link: new core_1.HttpLink({
         uri: "https://graphql.contentful.com/content/v1/spaces/" + space,
@@ -122,7 +150,7 @@ function throwUndefinedError(name) {
     return [];
 }
 function generateReadme(inputs) {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
         const octokit = new core_2.Octokit({ auth: process.env.GITHUB_TOKEN });
         const apolloClient = getApollo(inputs["contentfulAccessToken"], inputs["contentfulSpaceId"]);
@@ -136,14 +164,10 @@ function generateReadme(inputs) {
         console.log(queryResult.data.keyValuePairCollection);
         console.log((_a = queryResult.data.setOfProjectsCollection) === null || _a === void 0 ? void 0 : _a.items);
         const queryKeyValuePairs = utils_1.arrayToObjectMap((_c = (_b = queryResult.data.keyValuePairCollection) === null || _b === void 0 ? void 0 : _b.items) !== null && _c !== void 0 ? _c : throwUndefinedError("keyValuePairCollection"), kvp => kvp.value, kvp => keyValuePairs[kvp.key]);
-        /*const queryKeyValuePairs = queryResult.data.items.map(item => ({
-            [item.key]: item.value
-        })).reduce((prev, cur) => ({...prev, ...cur}));*/
         const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY;
         if (GITHUB_REPOSITORY === undefined) {
             throw new Error("GITHUB_REPOSITORY is undefined");
         }
-        //const repoCount = parseInt(inputs["repoCount"]);
         const username = GITHUB_REPOSITORY.split("/")[0];
         const repo = GITHUB_REPOSITORY.split("/")[1];
         const getReadme = yield octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
@@ -155,44 +179,12 @@ function generateReadme(inputs) {
         const sha = getReadme.data.sha;
         if (sha === undefined)
             throw new Error("Commit SHA is undefined");
-        //let recentReposHaveImage: boolean[] = [];
-        //let recentRepos = new Set<string>();
-        /** GitHub Activity pagination is limited at 100 records x 3 pages */
-        /*for (let i = 0; recentRepos.size < repoCount && i < 3; i++) {
-            console.log(i);
-            const getActivity = await octokit.request(`GET /users/{username}/events/public?per_page=100&page=${i}`, {
-                username: username,
-            }).catch(e => {
-                throw e;
-            });
-            console.log(getActivity);
-            console.log(getActivity.data);
-            for (const value of getActivity.data) {
-                console.log(value);
-                let activityRepo = value.repo.name;
-                if (value.type === "ForkEvent") activityRepo = value.payload.forkee.full_name;
-                if (!JSON.parse(inputs["excludeActivity"]).includes(value.type) && !JSON.parse(inputs['excludeRepo']).includes(activityRepo)) {
-                    recentRepos.add(activityRepo);
-                }
-                if (recentRepos.size >= repoCount) break;
-            }
-        }
-    
-        for (const repo of recentRepos) {
-            await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
-                owner: repo.split("/")[0],
-                repo: repo.split("/")[1],
-                path: 'DISPLAY.jpg',
-            }).then(() => {
-                recentReposHaveImage.push(true);
-            }).catch(e => {
-                recentReposHaveImage.push(false);
-            });
-        }*/
         const data = `
 # ${queryKeyValuePairs["header"]}
 
 ### ${queryKeyValuePairs["subheader"]}
+${((_d = queryResult.data.positionCollection) === null || _d === void 0 ? void 0 : _d.items[0]) !== undefined
+            ? "\n" + CurrentPosition_1.default(queryResult.data.positionCollection.items) : ""}
 ${queryKeyValuePairs["url"] !== undefined ? (`
 <table><tr><td><a href="${queryKeyValuePairs["url"]}"><img align="left" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/link-24px.svg">Go to website</a></td></tr></table>`) : ""}
 ${inputs["setOfProjectsCollectionId"] !== undefined && queryResult.data.setOfProjectsCollection
@@ -551,11 +543,7 @@ function run() {
                 "urlKey",
                 "setOfProjectsCollectionId",
                 "projectsLimit",
-                "path",
-                "ref",
-                "imageSize",
-                "excludeActivity",
-                "excludeRepo"
+                "path"
             ], (item) => core.getInput(item));
             yield generate_1.default(inputs);
         }
@@ -6984,7 +6972,7 @@ exports.Octokit = Octokit;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 
-var isPlainObject = __nccwpck_require__(558);
+var isPlainObject = __nccwpck_require__(3287);
 var universalUserAgent = __nccwpck_require__(5030);
 
 function lowercaseKeys(object) {
@@ -7374,52 +7362,6 @@ exports.endpoint = endpoint;
 
 /***/ }),
 
-/***/ 558:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-
-/*!
- * is-plain-object <https://github.com/jonschlinkert/is-plain-object>
- *
- * Copyright (c) 2014-2017, Jon Schlinkert.
- * Released under the MIT License.
- */
-
-function isObject(o) {
-  return Object.prototype.toString.call(o) === '[object Object]';
-}
-
-function isPlainObject(o) {
-  var ctor,prot;
-
-  if (isObject(o) === false) return false;
-
-  // If has modified constructor
-  ctor = o.constructor;
-  if (ctor === undefined) return true;
-
-  // If has modified prototype
-  prot = ctor.prototype;
-  if (isObject(prot) === false) return false;
-
-  // If constructor does not have an Object-specific method
-  if (prot.hasOwnProperty('isPrototypeOf') === false) {
-    return false;
-  }
-
-  // Most likely a plain Object
-  return true;
-}
-
-exports.isPlainObject = isPlainObject;
-
-
-/***/ }),
-
 /***/ 8467:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -7611,7 +7553,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var endpoint = __nccwpck_require__(9440);
 var universalUserAgent = __nccwpck_require__(5030);
-var isPlainObject = __nccwpck_require__(9062);
+var isPlainObject = __nccwpck_require__(3287);
 var nodeFetch = _interopDefault(__nccwpck_require__(467));
 var requestError = __nccwpck_require__(537);
 
@@ -7751,52 +7693,6 @@ const request = withDefaults(endpoint.endpoint, {
 
 exports.request = request;
 //# sourceMappingURL=index.js.map
-
-
-/***/ }),
-
-/***/ 9062:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-
-/*!
- * is-plain-object <https://github.com/jonschlinkert/is-plain-object>
- *
- * Copyright (c) 2014-2017, Jon Schlinkert.
- * Released under the MIT License.
- */
-
-function isObject(o) {
-  return Object.prototype.toString.call(o) === '[object Object]';
-}
-
-function isPlainObject(o) {
-  var ctor,prot;
-
-  if (isObject(o) === false) return false;
-
-  // If has modified constructor
-  ctor = o.constructor;
-  if (ctor === undefined) return true;
-
-  // If has modified prototype
-  prot = ctor.prototype;
-  if (isObject(prot) === false) return false;
-
-  // If constructor does not have an Object-specific method
-  if (prot.hasOwnProperty('isPrototypeOf') === false) {
-    return false;
-  }
-
-  // Most likely a plain Object
-  return true;
-}
-
-exports.isPlainObject = isPlainObject;
 
 
 /***/ }),
@@ -29067,6 +28963,52 @@ var versionInfo = Object.freeze({
   preReleaseTag: null
 });
 exports.versionInfo = versionInfo;
+
+
+/***/ }),
+
+/***/ 3287:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+/*!
+ * is-plain-object <https://github.com/jonschlinkert/is-plain-object>
+ *
+ * Copyright (c) 2014-2017, Jon Schlinkert.
+ * Released under the MIT License.
+ */
+
+function isObject(o) {
+  return Object.prototype.toString.call(o) === '[object Object]';
+}
+
+function isPlainObject(o) {
+  var ctor,prot;
+
+  if (isObject(o) === false) return false;
+
+  // If has modified constructor
+  ctor = o.constructor;
+  if (ctor === undefined) return true;
+
+  // If has modified prototype
+  prot = ctor.prototype;
+  if (isObject(prot) === false) return false;
+
+  // If constructor does not have an Object-specific method
+  if (prot.hasOwnProperty('isPrototypeOf') === false) {
+    return false;
+  }
+
+  // Most likely a plain Object
+  return true;
+}
+
+exports.isPlainObject = isPlainObject;
 
 
 /***/ }),

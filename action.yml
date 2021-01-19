@@ -37,22 +37,6 @@ inputs:
     description: 'Path of your README.md file.'
     required: false
     default: 'README.md'
-  ref:
-    description: 'Override the default branch/tag ref.'
-    required: false
-    default: 'master'
-  imageSize:
-    description: 'Length (in pixels) of each side of the square image.'
-    required: false
-    default: '200'
-  excludeActivity:
-    description: "Types of event to exclude from the recent activity table. Read more on this repository's README.md."
-    required: false
-    default: '[]'
-  excludeRepo:
-    description: "Repositories to exclude from the recent activity table. Read more on this repository's README.md."
-    required: false
-    default: '[]'
 
 branding:
   icon: activity

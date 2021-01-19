@@ -1,82 +1,69 @@
 # github-contentful-readme
-## This is a work in progress, and is not functional yet
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-![Example of profile README](https://raw.githubusercontent.com/theboi/github-update-readme/main/example.png)
-
 ## About
 
-This GitHub Action updates your profile README.md to show your latest activity.
+This GitHub Action updates your profile README.md based on data in the Contentful headless CMS. Right now it can show the following:
+
+- Header
+- Subheader
+- Footer
+- Website URL (formatted like a button)
+- Current position
+- Projects
+
+The code is built around my Contentful setup so it probably won't work for you out of the box, luckily it is easy to modify:
+
+1. Edit `src/queries/readme.gql` to provide the data that you want to display
+2. Create `.env.contentful-codegen` with the following template, adding the corresponding values after the `=`:
+```env
+CONTENTFUL_CONTENT_TOKEN=
+CONTENTFUL_MANAGEMENT_TOKEN=
+CONTENTFUL_SPACE_ID=
+```
+3. Run `yarn gql-codegen` to generate TypeScript typings for your GraphQL objects (uses `fix-contentful-schema` so the required properties in the typings will match the required option in your Contentful content type definitions)
+4. Update any type/interface names in the files in the `src` directory that may have changed from the code generation
+5. Edit `src/main.ts` and `action.yml` to define the action inputs
+6. Edit `src/generate.ts` to use the values from the query (right now there's some code to handle key value pair objects but you can remove that if you want)
 
 ## Inputs
 
-### `header`
+### `contentfulAccessToken`
 
-**Required** The header of your README.md. Markdown supported.
+**Required** Contentful content access token
 
-### `subhead`
+### `contentfulSpaceId`
 
-The subheader of your README.md. Markdown supported. Default `""`.
+**Required** Contentful space ID (not the name)
 
-### `footer`
+### `headerKey`
 
-The footer of your README.md. Markdown supported. Default `""`.
+**Required** The name of the Key-Value pair in Contentful with the header text
+
+### `subheaderKey`
+
+The name of the Key-Value pair in Contentful with the subheader text
+
+### `footerKey`
+
+The name of the Key-Value pair in Contentful with the footer text
+
+### `setOfProjectsCollectionId`
+
+The ID of the set of projects in Contentful to display
+
+### `urlKey`
+
+The name of the Key-Value pair in Contentful with a URL for a website to link to
+
+### `projectsLimit`
+
+The limit of the number of projects to display
 
 ### `path`
 
-Path of your README.md file. Default `"README.md"`.
-
-### `ref`
-
-Override the default branch/tag ref. Default `"master"`.
-
-### `repoCount`
-
-Number of repositories to load. Default `"6"`.
-
-### `reposPerRow`
-
-Number of repositories to load per row. Default `"3"`.
-
-### `imageSize`
-
-Length (in pixels) of each side of the square image. Default `"150"`.
-
-### `excludeActivity`
-
-Types of event to exclude from the recent activity table in a **JSON array**. Recent events, such as `"PushEvent"` or `"ForkEvent"`, can be found at https://api.github.com/users/{username}/events, replacing `username` with your username. Example input would be `'["WatchEvent", "ForkEvent"]'`. Default `"[]"`.
-
-### `excludeRepo`
-
-Repositories to exclude from the recent activity table in a **JSON array**. Example input would be `'["theboi/theboi", "username/repo"]'`. Default `"[]"`.
-
-### `customReadmeFile`
-
-Customise the README.md file format without forking this repository. Markdown supported.
-
-Use these reserved strings wrapped in `${` and `}` (For instance, `${header}`) to reference certain content:
-- `repoTable`: Set of tables with most recent repository activity.
-- `header`
-- `subhead`
-- `footer`
-
-```yaml
-Default: |
-  ## ${header}
-      
-  ${subhead}
-
-  ---
-      
-  ${repoTable}
-      
-  ---
-      
-  ${footer}
-```
-
-Note: `|` denotes a multiline string block in YAML. Ensure you indent properly when setting this.
+Path of your README.md file.
 
 ## Environment Inputs
 
@@ -84,36 +71,32 @@ Note: `|` denotes a multiline string block in YAML. Ensure you indent properly w
 
 **Required** Set this to: `${{ secrets.GITHUB_TOKEN }}`
 
-## Outputs
-
-### `repositories`
-
-Array of recent repositories to be displayed on your profile README.md.
-
 ## Example usage
 
+This article applies to the repository that this is based on. Most of it will also apply to this repository but you will need to make changes to the parameters and `uses` field, see the example below.
+
 - Article on Medium: https://medium.com/@theboi/how-to-dynamically-update-your-github-profile-readme-using-github-actions-684be5db9932
+
 - Create a repository named your username, add a `README.md` file.
 - Create a workflow and paste this under `steps`:
 ```yaml
-- name: Update GitHub Profile README
-  uses: theboi/github-update-readme@v1.0
+- name: Update README
+  id: github-contentful-readme
+  uses: Merlin04/github-contentful-readme@v[Insert latest release here, see https://github.com/Merlin04/github-contentful-readme/releases]
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   with:
-    header: "Hey, I'm Ryan! 👋"
-    subhead: "Currently a student in Singapore, passionate about creating all-things-tech to improve society."
-    footer: "**Learn more about me at [ryanthe.com](https://www.ryanthe.com)!**"
-```
+    headerKey: "github-header"
+    subheaderKey: "github-subheader"
+    footerKey: "github-footer"
+    setOfProjectsCollectionId: "projects-collection-id"
+    urlKey: "website-url"
+    projectsLimit: 4
+    contentfulAccessToken: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
+    contentfulSpaceId: ${{ secrets.CONTENTFUL_SPACE_ID }}```
 - You might want to schedule this to run every 10 mins, paste this under `on`:
 ```yaml
 schedule:
   - cron: "*/10 * * * *"
 ```
-- This will now run and fetch repositories you were most recently active on, every 10 mins.
-- **Important** Add a `DISPLAY.jpg` to your repositories (including username/username) to show in the table. If image does not exist, will default to `DISPLAY.jpg` on username/username.
-
-## Note
-
-- Due to GitHub's API rate-limiting, this GitHub Action will, at most, only check your 1000 most recent activities.
-- This is also my first GitHub Action so feel free to suggest improvements/submit a PR. Thanks!
+- This will now run, updating your README with the latest values from Contentful, every 10 mins.

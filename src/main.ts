@@ -13,11 +13,7 @@ async function run(): Promise<void> {
             "urlKey",
             "setOfProjectsCollectionId",
             "projectsLimit",
-            "path",
-            "ref",
-            "imageSize",
-            "excludeActivity",
-            "excludeRepo"
+            "path"
         ], (item) => core.getInput(item));
 
         await generateReadme(inputs);
