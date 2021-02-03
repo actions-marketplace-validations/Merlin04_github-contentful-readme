@@ -150,7 +150,7 @@ function throwUndefinedError(name) {
     return [];
 }
 function generateReadme(inputs) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
     return __awaiter(this, void 0, void 0, function* () {
         const octokit = new core_2.Octokit({ auth: process.env.GITHUB_TOKEN });
         const apolloClient = getApollo(inputs["contentfulAccessToken"], inputs["contentfulSpaceId"]);
@@ -179,11 +179,13 @@ function generateReadme(inputs) {
         const sha = getReadme.data.sha;
         if (sha === undefined)
             throw new Error("Commit SHA is undefined");
+        // @ts-ignore
+        const readmeContents = Buffer.from((_d = getReadme.data.content) !== null && _d !== void 0 ? _d : "", 'base64').toString();
         const data = `
 # ${queryKeyValuePairs["header"]}
 
 ### ${queryKeyValuePairs["subheader"]}
-${((_d = queryResult.data.positionCollection) === null || _d === void 0 ? void 0 : _d.items[0]) !== undefined
+${((_e = queryResult.data.positionCollection) === null || _e === void 0 ? void 0 : _e.items[0]) !== undefined
             ? "\n" + CurrentPosition_1.default(queryResult.data.positionCollection.items) : ""}
 ${queryKeyValuePairs["url"] !== undefined ? (`
 <table><tr><td><a href="${queryKeyValuePairs["url"]}"><img align="left" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/link-24px.svg">Go to website</a></td></tr></table>`) : ""}
@@ -192,6 +194,10 @@ ${inputs["setOfProjectsCollectionId"] !== undefined && queryResult.data.setOfPro
 
 ${queryKeyValuePairs["footer"]}
     `;
+        if (readmeContents === data) {
+            console.log("No changes made to README output, so not creating a commit");
+            return;
+        }
         yield octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
             owner: username,
             repo: repo,

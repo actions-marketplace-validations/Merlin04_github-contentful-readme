@@ -56,6 +56,9 @@ export default async function generateReadme(inputs: KeyValueStore) {
     const sha = getReadme.data.sha;
     if (sha === undefined) throw new Error("Commit SHA is undefined");
 
+    // @ts-ignore
+    const readmeContents = Buffer.from((getReadme.data.content as string | undefined) ?? "", 'base64').toString();
+
     const data = `
 # ${queryKeyValuePairs["header"]}
 
@@ -71,6 +74,11 @@ ${inputs["setOfProjectsCollectionId"] !== undefined && queryResult.data.setOfPro
 
 ${queryKeyValuePairs["footer"]}
     `;
+
+    if(readmeContents === data) {
+        console.log("No changes made to README output, so not creating a commit");
+        return;
+    }
 
     await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
         owner: username,
