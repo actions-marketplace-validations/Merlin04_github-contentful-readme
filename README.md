@@ -99,4 +99,4 @@ This article applies to the repository that this is based on. Most of it will al
 schedule:
   - cron: "*/10 * * * *"
 ```
-- This will now run, updating your README with the latest values from Contentful, every 10 mins. 
+- This will now run, updating your README with the latest values from Contentful, every 10 mins.
