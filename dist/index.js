@@ -8,6 +8,16 @@ module.exports =
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+// Sort the positions so that at the beginning are the positions with an undefined endDate (sorted by their startDate from most recent to oldest), then all the others sorted by their startDate from most recent to oldest
+function sortPositions(positions) {
+    // Split the positions into two arrays, one with the positions with an undefined endDate and the other for the others
+    return positions.reduce((accumulator, position) => {
+        accumulator[position.endDate ? 1 : 0].push(position);
+        return accumulator;
+    }, [[], []])
+        .map((positions) => positions.sort((a, b) => +parseStringDate(b.startDate) - +parseStringDate(a.startDate)))
+        .flat();
+}
 function parseStringDate(date) {
     const split = date.split('/');
     switch (split.length) {
@@ -25,11 +35,8 @@ function parseStringDate(date) {
         }
     }
 }
-function sortItemsByDate(items, getDateProperty) {
-    return items.slice().sort((a, b) => +parseStringDate(getDateProperty(b)) - +parseStringDate(getDateProperty(a)));
-}
 function CurrentPosition(positions) {
-    const latestPosition = sortItemsByDate(positions, position => position.startDate)[0];
+    const latestPosition = sortPositions(positions)[0];
     return `<img align="left" src="https://raw.githubusercontent.com/Merlin04/github-contentful-readme/main/business-24px.svg">${latestPosition.position} at
 ${latestPosition.companyUrl ? `<a href="${latestPosition.companyUrl}">${latestPosition.company}</a>` : latestPosition.company}`;
 }
@@ -49,7 +56,8 @@ const TR_CLOSE = `
 const TR_OPEN = `
 <tr>`;
 function ItemTable(items, colCount, colWidth) {
-    let result = `<table>`;
+    let result = `### Featured projects
+<table>`;
     for (let i = 0; i < items.length; i++) {
         if (i % colCount === 0) {
             if (i !== 0) {
@@ -222,7 +230,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ReadmeData = exports.PositionReadme = exports.FeaturedProject = exports.ProjectMedia = exports.SkillOrder = exports.KeyValuePairOrder = exports.SetOfProjectsOrder = exports.ProjectOrder = exports.AwardOrder = exports.PositionOrder = exports.AnnouncementOrder = exports.SetOfAnnouncementsOrder = exports.AssetOrder = exports.ImageFormat = exports.ImageResizeFocus = exports.ImageResizeStrategy = void 0;
+exports.ReadmeData = exports.PositionReadme = exports.FeaturedProject = exports.ProjectMedia = exports.EntryOrder = exports.SkillOrder = exports.KeyValuePairOrder = exports.SetOfProjectsOrder = exports.ProjectOrder = exports.AwardOrder = exports.PositionOrder = exports.AnnouncementOrder = exports.SetOfAnnouncementsOrder = exports.AssetOrder = exports.ImageFormat = exports.ImageResizeFocus = exports.ImageResizeStrategy = void 0;
 const graphql_tag_1 = __importDefault(__nccwpck_require__(8377));
 var ImageResizeStrategy;
 (function (ImageResizeStrategy) {
@@ -439,6 +447,17 @@ var SkillOrder;
     SkillOrder["SysPublishedVersionAsc"] = "sys_publishedVersion_ASC";
     SkillOrder["SysPublishedVersionDesc"] = "sys_publishedVersion_DESC";
 })(SkillOrder = exports.SkillOrder || (exports.SkillOrder = {}));
+var EntryOrder;
+(function (EntryOrder) {
+    EntryOrder["SysIdAsc"] = "sys_id_ASC";
+    EntryOrder["SysIdDesc"] = "sys_id_DESC";
+    EntryOrder["SysPublishedAtAsc"] = "sys_publishedAt_ASC";
+    EntryOrder["SysPublishedAtDesc"] = "sys_publishedAt_DESC";
+    EntryOrder["SysFirstPublishedAtAsc"] = "sys_firstPublishedAt_ASC";
+    EntryOrder["SysFirstPublishedAtDesc"] = "sys_firstPublishedAt_DESC";
+    EntryOrder["SysPublishedVersionAsc"] = "sys_publishedVersion_ASC";
+    EntryOrder["SysPublishedVersionDesc"] = "sys_publishedVersion_DESC";
+})(EntryOrder = exports.EntryOrder || (exports.EntryOrder = {}));
 exports.ProjectMedia = graphql_tag_1.default `
     fragment ProjectMedia on Asset {
   title
@@ -466,6 +485,7 @@ exports.PositionReadme = graphql_tag_1.default `
   companyUrl
   position
   startDate
+  endDate
 }
     `;
 exports.ReadmeData = graphql_tag_1.default `
