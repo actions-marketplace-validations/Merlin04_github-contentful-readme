@@ -5,7 +5,8 @@ const TR_OPEN = `
 <tr>`;
 
 export default function ItemTable(items: string[], colCount: number, colWidth?: number) {
-    let result = `<table>`;
+    let result = `### Featured projects
+<table>`;
 
     for(let i = 0; i < items.length; i++) {
         if(i % colCount === 0) {

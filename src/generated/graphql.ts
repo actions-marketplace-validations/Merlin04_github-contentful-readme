@@ -45,6 +45,7 @@ export type Query = {
   keyValuePairCollection?: Maybe<KeyValuePairCollection>;
   skill?: Maybe<Skill>;
   skillCollection?: Maybe<SkillCollection>;
+  entryCollection?: Maybe<EntryCollection>;
 };
 
 
@@ -200,10 +201,21 @@ export type QuerySkillCollectionArgs = {
   order?: Maybe<Array<Maybe<SkillOrder>>>;
 };
 
+
+export type QueryEntryCollectionArgs = {
+  skip?: Maybe<Scalars['Int']>;
+  limit?: Maybe<Scalars['Int']>;
+  preview?: Maybe<Scalars['Boolean']>;
+  locale?: Maybe<Scalars['String']>;
+  where?: Maybe<EntryFilter>;
+  order?: Maybe<Array<Maybe<EntryOrder>>>;
+};
+
 /** Represents a binary file in a space. An asset can be any file type. */
 export type Asset = {
   __typename?: 'Asset';
   sys: Sys;
+  contentfulMetadata: ContentfulMetadata;
   title?: Maybe<Scalars['String']>;
   description?: Maybe<Scalars['String']>;
   contentType?: Maybe<Scalars['String']>;
@@ -237,6 +249,21 @@ export type Sys = {
   publishedVersion?: Maybe<Scalars['Int']>;
 };
 
+
+export type ContentfulMetadata = {
+  __typename?: 'ContentfulMetadata';
+  tags: Array<Maybe<ContentfulTag>>;
+};
+
+/**
+ * Represents a tag entity for finding and organizing content easily.
+ *     Find out more here: https://www.contentful.com/developers/docs/references/content-delivery-api/#/reference/content-tags
+ */
+export type ContentfulTag = {
+  __typename?: 'ContentfulTag';
+  id?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
+};
 
 export type ImageTransformOptions = {
   /** Desired width in pixels. Defaults to the original image width. */
@@ -367,6 +394,7 @@ export type EntryCollection = {
 
 export type Entry = {
   sys: Sys;
+  contentfulMetadata: ContentfulMetadata;
 };
 
 export type ProjectCollection = {
@@ -381,6 +409,7 @@ export type ProjectCollection = {
 export type Project = Entry & {
   __typename?: 'Project';
   sys: Sys;
+  contentfulMetadata: ContentfulMetadata;
   linkedFrom?: Maybe<ProjectLinkingCollections>;
   title: Scalars['String'];
   url?: Maybe<Scalars['String']>;
@@ -495,6 +524,7 @@ export type AwardCollection = {
 export type Award = Entry & {
   __typename?: 'Award';
   sys: Sys;
+  contentfulMetadata: ContentfulMetadata;
   linkedFrom?: Maybe<AwardLinkingCollections>;
   organization: Scalars['String'];
   organizationUrl?: Maybe<Scalars['String']>;
@@ -579,6 +609,7 @@ export type SetOfProjectsCollection = {
 export type SetOfProjects = Entry & {
   __typename?: 'SetOfProjects';
   sys: Sys;
+  contentfulMetadata: ContentfulMetadata;
   linkedFrom?: Maybe<SetOfProjectsLinkingCollections>;
   id?: Maybe<Scalars['String']>;
   featuredProjectsCollection: SetOfProjectsFeaturedProjectsCollection;
@@ -664,6 +695,7 @@ export type ProjectSkillsCollection = {
 export type Skill = Entry & {
   __typename?: 'Skill';
   sys: Sys;
+  contentfulMetadata: ContentfulMetadata;
   linkedFrom?: Maybe<SkillLinkingCollections>;
   title: Scalars['String'];
 };
@@ -704,6 +736,7 @@ export type SkillLinkingCollectionsProjectCollectionArgs = {
 
 export type AssetFilter = {
   sys?: Maybe<SysFilter>;
+  contentfulMetadata?: Maybe<ContentfulMetadataFilter>;
   title_exists?: Maybe<Scalars['Boolean']>;
   title?: Maybe<Scalars['String']>;
   title_not?: Maybe<Scalars['String']>;
@@ -779,26 +812,43 @@ export type SysFilter = {
   id_contains?: Maybe<Scalars['String']>;
   id_not_contains?: Maybe<Scalars['String']>;
   publishedAt_exists?: Maybe<Scalars['Boolean']>;
-  publishedAt?: Maybe<Scalars['String']>;
-  publishedAt_not?: Maybe<Scalars['String']>;
-  publishedAt_in?: Maybe<Array<Maybe<Scalars['String']>>>;
-  publishedAt_not_in?: Maybe<Array<Maybe<Scalars['String']>>>;
-  publishedAt_contains?: Maybe<Scalars['String']>;
-  publishedAt_not_contains?: Maybe<Scalars['String']>;
+  publishedAt?: Maybe<Scalars['DateTime']>;
+  publishedAt_not?: Maybe<Scalars['DateTime']>;
+  publishedAt_in?: Maybe<Array<Maybe<Scalars['DateTime']>>>;
+  publishedAt_not_in?: Maybe<Array<Maybe<Scalars['DateTime']>>>;
+  publishedAt_gt?: Maybe<Scalars['DateTime']>;
+  publishedAt_gte?: Maybe<Scalars['DateTime']>;
+  publishedAt_lt?: Maybe<Scalars['DateTime']>;
+  publishedAt_lte?: Maybe<Scalars['DateTime']>;
   firstPublishedAt_exists?: Maybe<Scalars['Boolean']>;
-  firstPublishedAt?: Maybe<Scalars['String']>;
-  firstPublishedAt_not?: Maybe<Scalars['String']>;
-  firstPublishedAt_in?: Maybe<Array<Maybe<Scalars['String']>>>;
-  firstPublishedAt_not_in?: Maybe<Array<Maybe<Scalars['String']>>>;
-  firstPublishedAt_contains?: Maybe<Scalars['String']>;
-  firstPublishedAt_not_contains?: Maybe<Scalars['String']>;
+  firstPublishedAt?: Maybe<Scalars['DateTime']>;
+  firstPublishedAt_not?: Maybe<Scalars['DateTime']>;
+  firstPublishedAt_in?: Maybe<Array<Maybe<Scalars['DateTime']>>>;
+  firstPublishedAt_not_in?: Maybe<Array<Maybe<Scalars['DateTime']>>>;
+  firstPublishedAt_gt?: Maybe<Scalars['DateTime']>;
+  firstPublishedAt_gte?: Maybe<Scalars['DateTime']>;
+  firstPublishedAt_lt?: Maybe<Scalars['DateTime']>;
+  firstPublishedAt_lte?: Maybe<Scalars['DateTime']>;
   publishedVersion_exists?: Maybe<Scalars['Boolean']>;
-  publishedVersion?: Maybe<Scalars['String']>;
-  publishedVersion_not?: Maybe<Scalars['String']>;
-  publishedVersion_in?: Maybe<Array<Maybe<Scalars['String']>>>;
-  publishedVersion_not_in?: Maybe<Array<Maybe<Scalars['String']>>>;
-  publishedVersion_contains?: Maybe<Scalars['String']>;
-  publishedVersion_not_contains?: Maybe<Scalars['String']>;
+  publishedVersion?: Maybe<Scalars['Float']>;
+  publishedVersion_not?: Maybe<Scalars['Float']>;
+  publishedVersion_in?: Maybe<Array<Maybe<Scalars['Float']>>>;
+  publishedVersion_not_in?: Maybe<Array<Maybe<Scalars['Float']>>>;
+  publishedVersion_gt?: Maybe<Scalars['Float']>;
+  publishedVersion_gte?: Maybe<Scalars['Float']>;
+  publishedVersion_lt?: Maybe<Scalars['Float']>;
+  publishedVersion_lte?: Maybe<Scalars['Float']>;
+};
+
+export type ContentfulMetadataFilter = {
+  tags_exists?: Maybe<Scalars['Boolean']>;
+  tags?: Maybe<ContentfulMetadataTagsFilter>;
+};
+
+export type ContentfulMetadataTagsFilter = {
+  id_contains_all?: Maybe<Array<Maybe<Scalars['String']>>>;
+  id_contains_some?: Maybe<Array<Maybe<Scalars['String']>>>;
+  id_contains_none?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 export enum AssetOrder {
@@ -828,6 +878,7 @@ export enum AssetOrder {
 export type SetOfAnnouncements = Entry & {
   __typename?: 'SetOfAnnouncements';
   sys: Sys;
+  contentfulMetadata: ContentfulMetadata;
   linkedFrom?: Maybe<SetOfAnnouncementsLinkingCollections>;
   id: Scalars['String'];
   featuredAnnouncementsCollection?: Maybe<SetOfAnnouncementsFeaturedAnnouncementsCollection>;
@@ -889,6 +940,7 @@ export type SetOfAnnouncementsFeaturedAnnouncementsCollection = {
 export type Announcement = Entry & {
   __typename?: 'Announcement';
   sys: Sys;
+  contentfulMetadata: ContentfulMetadata;
   linkedFrom?: Maybe<AnnouncementLinkingCollections>;
   title?: Maybe<Scalars['String']>;
   information?: Maybe<Scalars['String']>;
@@ -959,6 +1011,7 @@ export type SetOfAnnouncementsNotFeaturedAnnouncementsCollection = {
 
 export type SetOfAnnouncementsFilter = {
   sys?: Maybe<SysFilter>;
+  contentfulMetadata?: Maybe<ContentfulMetadataFilter>;
   id_exists?: Maybe<Scalars['Boolean']>;
   id?: Maybe<Scalars['String']>;
   id_not?: Maybe<Scalars['String']>;
@@ -985,8 +1038,17 @@ export enum SetOfAnnouncementsOrder {
   SysPublishedVersionDesc = 'sys_publishedVersion_DESC'
 }
 
+export type AnnouncementCollection = {
+  __typename?: 'AnnouncementCollection';
+  total: Scalars['Int'];
+  skip: Scalars['Int'];
+  limit: Scalars['Int'];
+  items: Array<Announcement>;
+};
+
 export type AnnouncementFilter = {
   sys?: Maybe<SysFilter>;
+  contentfulMetadata?: Maybe<ContentfulMetadataFilter>;
   title_exists?: Maybe<Scalars['Boolean']>;
   title?: Maybe<Scalars['String']>;
   title_not?: Maybe<Scalars['String']>;
@@ -1027,18 +1089,11 @@ export enum AnnouncementOrder {
   SysPublishedVersionDesc = 'sys_publishedVersion_DESC'
 }
 
-export type AnnouncementCollection = {
-  __typename?: 'AnnouncementCollection';
-  total: Scalars['Int'];
-  skip: Scalars['Int'];
-  limit: Scalars['Int'];
-  items: Array<Announcement>;
-};
-
 /** A work position [See type definition](https://app.contentful.com/spaces/d4vc57z4o8dm/content_types/position) */
 export type Position = Entry & {
   __typename?: 'Position';
   sys: Sys;
+  contentfulMetadata: ContentfulMetadata;
   linkedFrom?: Maybe<PositionLinkingCollections>;
   company: Scalars['String'];
   companyUrl?: Maybe<Scalars['String']>;
@@ -1110,8 +1165,17 @@ export type PositionLinkingCollectionsEntryCollectionArgs = {
   locale?: Maybe<Scalars['String']>;
 };
 
+export type PositionCollection = {
+  __typename?: 'PositionCollection';
+  total: Scalars['Int'];
+  skip: Scalars['Int'];
+  limit: Scalars['Int'];
+  items: Array<Position>;
+};
+
 export type PositionFilter = {
   sys?: Maybe<SysFilter>;
+  contentfulMetadata?: Maybe<ContentfulMetadataFilter>;
   company_exists?: Maybe<Scalars['Boolean']>;
   company?: Maybe<Scalars['String']>;
   company_not?: Maybe<Scalars['String']>;
@@ -1183,17 +1247,10 @@ export enum PositionOrder {
   SysPublishedVersionDesc = 'sys_publishedVersion_DESC'
 }
 
-export type PositionCollection = {
-  __typename?: 'PositionCollection';
-  total: Scalars['Int'];
-  skip: Scalars['Int'];
-  limit: Scalars['Int'];
-  items: Array<Position>;
-};
-
 export type AwardFilter = {
   submissionProject?: Maybe<CfProjectNestedFilter>;
   sys?: Maybe<SysFilter>;
+  contentfulMetadata?: Maybe<ContentfulMetadataFilter>;
   organization_exists?: Maybe<Scalars['Boolean']>;
   organization?: Maybe<Scalars['String']>;
   organization_not?: Maybe<Scalars['String']>;
@@ -1243,6 +1300,7 @@ export type AwardFilter = {
 
 export type CfProjectNestedFilter = {
   sys?: Maybe<SysFilter>;
+  contentfulMetadata?: Maybe<ContentfulMetadataFilter>;
   title_exists?: Maybe<Scalars['Boolean']>;
   title?: Maybe<Scalars['String']>;
   title_not?: Maybe<Scalars['String']>;
@@ -1311,6 +1369,7 @@ export enum AwardOrder {
 
 export type ProjectFilter = {
   sys?: Maybe<SysFilter>;
+  contentfulMetadata?: Maybe<ContentfulMetadataFilter>;
   title_exists?: Maybe<Scalars['Boolean']>;
   title?: Maybe<Scalars['String']>;
   title_not?: Maybe<Scalars['String']>;
@@ -1375,6 +1434,7 @@ export enum ProjectOrder {
 
 export type SetOfProjectsFilter = {
   sys?: Maybe<SysFilter>;
+  contentfulMetadata?: Maybe<ContentfulMetadataFilter>;
   id_exists?: Maybe<Scalars['Boolean']>;
   id?: Maybe<Scalars['String']>;
   id_not?: Maybe<Scalars['String']>;
@@ -1405,6 +1465,7 @@ export enum SetOfProjectsOrder {
 export type KeyValuePair = Entry & {
   __typename?: 'KeyValuePair';
   sys: Sys;
+  contentfulMetadata: ContentfulMetadata;
   linkedFrom?: Maybe<KeyValuePairLinkingCollections>;
   key: Scalars['String'];
   value: Scalars['String'];
@@ -1441,8 +1502,17 @@ export type KeyValuePairLinkingCollectionsEntryCollectionArgs = {
   locale?: Maybe<Scalars['String']>;
 };
 
+export type KeyValuePairCollection = {
+  __typename?: 'KeyValuePairCollection';
+  total: Scalars['Int'];
+  skip: Scalars['Int'];
+  limit: Scalars['Int'];
+  items: Array<KeyValuePair>;
+};
+
 export type KeyValuePairFilter = {
   sys?: Maybe<SysFilter>;
+  contentfulMetadata?: Maybe<ContentfulMetadataFilter>;
   key_exists?: Maybe<Scalars['Boolean']>;
   key?: Maybe<Scalars['String']>;
   key_not?: Maybe<Scalars['String']>;
@@ -1476,16 +1546,17 @@ export enum KeyValuePairOrder {
   SysPublishedVersionDesc = 'sys_publishedVersion_DESC'
 }
 
-export type KeyValuePairCollection = {
-  __typename?: 'KeyValuePairCollection';
+export type SkillCollection = {
+  __typename?: 'SkillCollection';
   total: Scalars['Int'];
   skip: Scalars['Int'];
   limit: Scalars['Int'];
-  items: Array<KeyValuePair>;
+  items: Array<Skill>;
 };
 
 export type SkillFilter = {
   sys?: Maybe<SysFilter>;
+  contentfulMetadata?: Maybe<ContentfulMetadataFilter>;
   title_exists?: Maybe<Scalars['Boolean']>;
   title?: Maybe<Scalars['String']>;
   title_not?: Maybe<Scalars['String']>;
@@ -1510,13 +1581,23 @@ export enum SkillOrder {
   SysPublishedVersionDesc = 'sys_publishedVersion_DESC'
 }
 
-export type SkillCollection = {
-  __typename?: 'SkillCollection';
-  total: Scalars['Int'];
-  skip: Scalars['Int'];
-  limit: Scalars['Int'];
-  items: Array<Skill>;
+export type EntryFilter = {
+  sys?: Maybe<SysFilter>;
+  contentfulMetadata?: Maybe<ContentfulMetadataFilter>;
+  OR?: Maybe<Array<Maybe<EntryFilter>>>;
+  AND?: Maybe<Array<Maybe<EntryFilter>>>;
 };
+
+export enum EntryOrder {
+  SysIdAsc = 'sys_id_ASC',
+  SysIdDesc = 'sys_id_DESC',
+  SysPublishedAtAsc = 'sys_publishedAt_ASC',
+  SysPublishedAtDesc = 'sys_publishedAt_DESC',
+  SysFirstPublishedAtAsc = 'sys_firstPublishedAt_ASC',
+  SysFirstPublishedAtDesc = 'sys_firstPublishedAt_DESC',
+  SysPublishedVersionAsc = 'sys_publishedVersion_ASC',
+  SysPublishedVersionDesc = 'sys_publishedVersion_DESC'
+}
 
 export type ReadmeDataQueryVariables = Exact<{
   keyValuePairs?: Maybe<Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>>;
@@ -1573,7 +1654,7 @@ export type ProjectMediaFragment = (
 
 export type PositionReadmeFragment = (
   { __typename?: 'Position' }
-  & Pick<Position, 'company' | 'companyUrl' | 'position' | 'startDate'>
+  & Pick<Position, 'company' | 'companyUrl' | 'position' | 'startDate' | 'endDate'>
 );
 
 export const ProjectMedia = gql`
@@ -1603,6 +1684,7 @@ export const PositionReadme = gql`
   companyUrl
   position
   startDate
+  endDate
 }
     `;
 export const ReadmeData = gql`

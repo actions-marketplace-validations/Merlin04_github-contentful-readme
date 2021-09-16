@@ -52,5 +52,6 @@ fragment PositionReadme on Position {
     company,
     companyUrl,
     position,
-    startDate
+    startDate,
+    endDate
 }
